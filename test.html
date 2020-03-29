@@ -1,0 +1,503 @@
+<html>
+  <head>
+    <title>Road Race</title>
+    <script type="text/javascript">
+
+
+
+
+
+function Point(x, y) {
+  this.x = x;
+  this.y = y;
+  this.toString = function() { return("(" + this.x + "," + this.y + ")"); };
+}
+
+function Move(speed, direction, intent) {
+  this.speed = speed;
+  this.direction = direction;
+  this.intent = intent;
+}
+
+var SPEED_BASE = 0;
+var SPEED_SURGE = 1;
+var SPEED_SLOW = 2;
+var DIRECTION_STRAIGHT = 0;
+var DIRECTION_LEFT = 1;
+var DIRECTION_RIGHT = 2;
+var INTENT_DRAFT = 0;
+var INTENT_SURGE = 1;
+
+
+function Player(position, contactDirection, nextMove, energy, element) {
+  this.position = position;
+  this.contactDirection = contactDirection;
+  this.nextMove = nextMove;
+  this.energy = energy;
+  this.element = element;
+  this.finished = false;
+  this.rank = 0;
+  this._log = "";
+}
+
+var ROAD_WIDTH=160;
+var NUM_PLAYERS=20;
+var START_ENERGY=400;
+
+var players = new Array();
+
+var gameWindow;
+
+function init() {
+  gameWindow = document.getElementById('game');
+  // Create players
+  //
+  for (var i = 0; i < NUM_PLAYERS; i++) {
+    var x = 0;
+    var y = (i+0.5)/NUM_PLAYERS*ROAD_WIDTH;
+    var position = new Point(x, y);
+    var contactDirection = new Point(0, 0);
+    var move = new Move(SPEED_BASE, DIRECTION_STRAIGHT, INTENT_DRAFT);
+    var element = document.createElement('div');
+    element.style.width = 6;
+    element.style.height = 6;
+    element.style.backgroundColor = rgb(rand256(), rand256(), rand256());
+    element.style.position = 'absolute';
+    gameWindow.appendChild(element);
+    element.setAttribute('id', 'player-' + i);
+    
+    var player = new Player(position, contactDirection, move, START_ENERGY, element);
+    players[i] = player;
+  }
+  
+
+}
+
+function distanceSquared(pointA, pointB) {
+  var dx = pointA.x - pointB.x;
+  var dy = pointA.y - pointB.y;
+  var dSquared = dx*dx + dy*dy;
+  return(dSquared);
+}
+
+function orthogonalDistance(pointA, pointB) {
+  var dx = Math.abs(pointA.x - pointB.x);
+  var dy = Math.abs(pointA.y - pointB.y);
+  var dOrthogonal = dx + dy;
+  return(dOrthogonal);
+}
+
+var SIM_STEP_TIME_MS = 25;
+var BASE_VELOCITY = 5;
+var SURGE_RATIO = 1.2;
+var STEER_RATIO = 0.2;
+var STEER_SLOWDOWN_RATIO = Math.sqrt(1 - STEER_RATIO*STEER_RATIO);
+var FINISH_DISTANCE=5000;
+var PLAYER_RADIUS=3;
+var DRAFT_LENGTH=10;
+var DRAFT_WIDTH=10;
+var DRAFT_ENERGY_RATIO=0.5;
+var SLOW_ENERGY_GAIN=0.8;
+
+var MIN_TARGET_DISTANCE=1;
+var MIN_SURGE_AVOID_DISTANCE=1;
+var SURGE_AVERAGE_LENGTH=40;
+
+var SURGE_DECISION_RATIO=0.8;
+var DRAFT_DECISION_LENGTH=7;
+
+function moveOption(move, potential) {
+  this.move = move;
+  this.potential = potential;
+}
+
+
+function simulateStep(numFinished) {
+  // Get next moves
+  //
+  for (var i = 0; i < NUM_PLAYERS; i++) {
+    players[i]._log = "";
+    if (players[i].finished) {
+      continue;
+    }
+    if (players[i].energy >= 1) {
+      var willSurge = false;
+      
+      // If surging, likely continue
+      //
+      
+      if (players[i].nextMove.intent == INTENT_SURGE) {
+        if (Math.random() > 1/SURGE_AVERAGE_LENGTH) {
+          willSurge = true;
+        }
+      }
+      
+        
+      
+      // If not surging, possibly start
+      //
+      if (!willSurge) {
+        var distanceToFinish = FINISH_DISTANCE - players[i].position.x;
+        var energyToFinish = distanceToFinish / BASE_VELOCITY / SURGE_RATIO;
+        var surgeChance = SURGE_DECISION_RATIO * (players[i].energy*players[i].energy) / (energyToFinish*energyToFinish);
+        if (Math.random() < surgeChance) {
+          willSurge = true;
+        }
+      }
+      // If surging, determine direction
+      //
+      if (willSurge) {
+        players[i].nextMove.speed = SPEED_SURGE;
+        players[i].nextMove.intent = INTENT_SURGE;
+        // Check straight
+        //
+        var shouldGoStraight = true;
+        var pointStraight = new Point(players[i].x + BASE_VELOCITY*(1-SURGE_RATIO), players[i].y);
+        for (var j = 0; j < NUM_PLAYERS; j++) {
+          if (i != j) {
+            var distance = orthogonalDistance(pointStraight, players[i].position);
+            if (distance < 2*PLAYER_RADIUS + MIN_SURGE_AVOID_DISTANCE) {
+              shouldGoStraight = false;
+              break;
+            }
+          }
+        }
+        if (shouldGoStraight) {
+          players[i].nextMove.position = DIRECTION_STRAIGHT;
+          continue;
+        }
+        
+        // Check left, right
+        //
+        var pointLeft = new Point(pointStraight.x, pointStraight.y + PLAYER_RADIUS*2);
+        var pointRight = new Point(pointStraight.x, pointStraight.y - PLAYER_RADIUS*2);
+        var shouldGoLeft = true;
+        var shouldGoRight = true;
+        for (var j = 0; j < NUM_PLAYERS; j++) {
+          if (i != j) {
+            var distanceLeft = orthogonalDistance(pointLeft, players[i].position);
+            var distanceRight = orthogonalDistance(pointRight, players[i].position);
+            if (distanceLeft < 2*PLAYER_RADIUS + MIN_SURGE_AVOID_DISTANCE) {
+              shouldGoLeft = false;
+            }
+            if (distanceRight < 2*PLAYER_RADIUS + MIN_SURGE_AVOID_DISTANCE) {
+              shouldGoRight = false;
+            }
+          }
+        }
+        if (shouldGoRight && !shouldGoLeft) {
+          players[i].nextMove.direction = DIRECTION_RIGHT;
+        } else if (shouldGoLeft && !shouldGoRight) {
+          players[i].nextMove.DIRECTION_LEFT;
+        } else {
+          // Nowhere to go, choose randomly, remove intent for next step
+          //
+          players[i].nextMove.intent = INTENT_DRAFT;
+          if (Math.random() < 0.5) {
+            players[i].nextMove.direction = DIRECTION_RIGHT;
+          } else {
+            players[i].nextMove.direction = DIRECTION_LEFT;
+          }
+        }
+        players[i]._log += "Move=Surge,";
+        continue;
+        
+        
+      }
+    }
+    // Look for best potential to draft
+    //
+    var bestMove = new  Move(SPEED_BASE, DIRECTION_STRAIGHT, INTENT_DRAFT);
+    var bestMoveDistanceSquared = 0;
+    for (var j = 0; j < NUM_PLAYERS; j++) {
+      if (i != j) {
+        // Player must be ahead
+        //
+        if (players[i].position.x < players[j].position.x) {
+          var targetPosition = new Point(players[j].position.x - 2*PLAYER_RADIUS, players[j].position.y);
+          
+          var moveDistanceSquared = distanceSquared(players[i].position, targetPosition);
+          
+          if (!bestMoveDistanceSquared || moveDistanceSquared < bestMoveDistanceSquared) {
+            var dx = targetPosition.x - players[i].position.x;
+            var dy = targetPosition.y - players[i].position.y;
+            
+            if (dx > MIN_TARGET_DISTANCE && players[i].energy >= 1) {
+              bestMove.speed = SPEED_SURGE;
+            } else if (dx < -MIN_TARGET_DISTANCE) {
+              bestMove.speed = SPEED_SLOW;
+            } else {
+              bestMove.speed = SPEED_BASE;
+            }
+            
+            if (dy > MIN_TARGET_DISTANCE) {
+              bestMove.direction = DIRECTION_LEFT;
+            } else if (dy < -MIN_TARGET_DISTANCE) {
+              bestMove.direction = DIRECTION_RIGHT;
+            } else {
+              bestMove.direction = DIRECTION_STRAIGHT;
+            }
+            
+            bestMoveDistanceSquared = moveDistanceSquared;
+          }
+        }
+      }
+    }
+    // Evaluate best move
+    //
+    var willDraft = false;
+    if (bestMoveDistanceSquared) {
+      var draftProbabilitySquared = (DRAFT_DECISION_LENGTH*DRAFT_DECISION_LENGTH) / bestMoveDistanceSquared;
+      players[i]._log += "DraftProbabilitySquared=" + draftProbabilitySquared + ",";
+      players[i]._log += "BestMoveDistanceSquared=" + bestMoveDistanceSquared + ",";
+      var rand = Math.random();
+      if (rand*rand < draftProbabilitySquared) {
+        players[i].nextMove = bestMove;
+        willDraft = true;
+        players[i]._log += "MoveDirection=" + bestMove.direction;
+        players[i]._log += "Move=Intentional drafting,";
+      }
+    }
+    // Default move
+    //
+    if (!willDraft) {
+      var defaultMove = new Move(SPEED_BASE, DIRECTION_STRAIGHT, INTENT_DRAFT);
+      players[i].nextMove = defaultMove;
+      players[i]._log += "Move=none,";
+    }
+  }
+  
+  // Increment next moves
+  //
+  for (var i = 0; i < NUM_PLAYERS; i++) {
+    if (players[i].finished) {
+      continue;
+    }
+    
+    var velocity = BASE_VELOCITY;
+    var thisMove = players[i].nextMove;
+    var thisDelta = new Point(0, 0)
+    if (thisMove.speed == SPEED_SURGE) {
+      velocity = BASE_VELOCITY*SURGE_RATIO;
+      players[i].energy -= 1;
+    } else if (thisMove.speed == SPEED_SLOW) {
+      velocity = BASE_VELOCITY/SURGE_RATIO;
+      players[i].energy += SLOW_ENERGY_GAIN;
+    }
+    
+    if (thisMove.direction == DIRECTION_STRAIGHT) {
+      thisDelta.x = velocity;
+      thisDelta.y = 0;
+    } else if (thisMove.direction == DIRECTION_LEFT) {
+      thisDelta.x = velocity*STEER_SLOWDOWN_RATIO;
+      thisDelta.y = velocity*STEER_RATIO;
+    } else {
+      thisDelta.x = velocity*STEER_SLOWDOWN_RATIO;
+      thisDelta.y = -velocity*STEER_RATIO;
+    }
+    
+    players[i].position.x += thisDelta.x;
+    players[i].position.y += thisDelta.y;
+    
+    // Stay on road
+    if (players[i].position.y < 0) {
+      players[i].position.y = 0;
+    } else if (players[i].position.y > ROAD_WIDTH) {
+      players[i].position.y = ROAD_WIDTH;
+    }
+    
+    
+    
+  }
+  
+  // Resolve next moves
+  //
+  for (var i = 0; i < NUM_PLAYERS; i++) {
+    // Default move takes precedence
+    //
+    if (players[i].nextMove.speed == SPEED_BASE && players[i].nextMove.direction == DIRECTION_STRAIGHT) {
+      continue;
+    }
+    
+    for (var j = 0; j < NUM_PLAYERS; j++) {
+      if (i != j) {
+        var thisDistanceSquared = distanceSquared(players[i].position, players[j].position);
+        if (thisDistanceSquared < PLAYER_RADIUS*2) {
+          var thisDistance = Math.sqrt(thisDistanceSquared);
+          var repelDistance = PLAYER_RADIUS*2 - thisDistance;
+          var dx = players[i].position.x - players[j].position.x;
+          var dy = players[i].position.y - players[j].position.y;
+          if (thisDistance != 0) {
+            players[i].contactDirection.x = players[i].contactDirection.x + dx/thisDistance*repelDistance;
+            players[i].contactDirection.y = players[i].contactDirection.y + dy/thisDistance*repelDistance;
+          }
+            
+        }
+      }
+    }
+    
+    
+  }
+  
+  // Move players
+  //
+  for (var i = 0; i < NUM_PLAYERS; i++) {
+    players[i].position.x = players[i].position.x + players[i].contactDirection.x;
+    players[i].position.y = players[i].position.y + players[i].contactDirection.y;
+    players[i].contactDirection = new Point(0, 0);
+  }
+  
+  // Calculate draft
+  //
+  for (var i = 0; i < NUM_PLAYERS; i++) {
+    for (var j = 0; j < NUM_PLAYERS; j++) {
+      if (i != j) {
+        if (players[i].position.x <= players[j].position.x) {
+          dx = Math.abs(players[j].position.x - players[i].position.x - PLAYER_RADIUS);
+          if (dx < DRAFT_LENGTH) {
+            dy = Math.abs(players[j].position.y - players[i].position.y);
+            if (dy < DRAFT_WIDTH/2) {
+              var draftRatio = (DRAFT_WIDTH/2 + DRAFT_LENGTH - dx - dy) / (DRAFT_WIDTH/2 + DRAFT_LENGTH);
+              var energyAdd = draftRatio*DRAFT_ENERGY_RATIO;
+              players[i].energy += energyAdd;
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  // Check who is finished
+  //
+  var newNumFinished = numFinished;
+  for (var i = 0; i < NUM_PLAYERS; i++) {
+    if (!players[i].finished && players[i].position.x >= FINISH_DISTANCE) {
+      players[i].finished = true;
+      newNumFinished++;
+      players[i].rank = newNumFinished;
+//      alert('Player ' + i + ' finished in rank ' + newNumFinished);
+    }
+  }
+  
+  return newNumFinished;
+  
+  
+}
+
+function rgb(r, g, b) {
+  return "rgb("+r+","+g+","+b+")";
+}
+
+function rand256() {
+  return Math.floor(Math.random()*256);
+}
+
+
+function ScreenPosition(left, top) {
+  this.top = top;
+  this.left = left;
+}
+
+var BASE_BOTTOM=300;
+var BASE_LEFT=400;
+var POINT_TO_SCREEN_RATIO_X=1;
+var POINT_TO_SCREEN_RATIO_Y=1;
+
+
+var CENTER_PLAYER=10;
+
+function pointToScreen(point) {
+  var left = BASE_LEFT + (point.x - players[CENTER_PLAYER].position.x) * POINT_TO_SCREEN_RATIO_X;
+  var top = BASE_BOTTOM - point.y * POINT_TO_SCREEN_RATIO_Y;
+  //var left = gameWindow.style.left + BASE_LEFT + point.x * POINT_TO_SCREEN_RATIO_X;
+  //var top = gameWindow.style.top + BASE_BOTTOM - point.y * POINT_TO_SCREEN_RATIO_Y;
+  return new ScreenPosition(left, top); 
+}
+
+
+function animate() {
+  // Position players
+  //
+  for (var i = 0; i < NUM_PLAYERS; i++) {
+    var thisScreenPosition = pointToScreen(players[i].position);
+    
+    players[i].element.style.top = thisScreenPosition.top;
+    players[i].element.style.left = thisScreenPosition.left;
+    
+    
+  }
+}
+
+
+
+function simulate() {
+  init();
+  
+  testDisplay();
+  animate();
+  
+}
+
+function doStepAndShow(numFinished) {
+  var newNumFinished = simulateStep(numFinished);
+  //testDisplay();
+  animate();
+  if (newNumFinished < NUM_PLAYERS) {
+    setTimeout('doStepAndShow(' + newNumFinished + ')', SIM_STEP_TIME_MS);
+  }
+}
+
+
+function testDisplay() {
+  var label = document.getElementById('label');
+  var output = "";
+  for (var i = 0; i < NUM_PLAYERS; i++) {
+    var nextPoint = "(" + players[i].position.x + ", " + players[i].position.y + ") ";
+    output += nextPoint;
+  }
+  label.innerHTML = output;
+
+
+}
+
+function showDebugInfo() {
+  var label = document.getElementById('label');
+  
+  var output = "Energy: <br>";
+  for (var i = 0; i < NUM_PLAYERS; i++) {
+    output += i + ": " + players[i].rank + " <br>";
+  }
+  
+  label.innerHTML = output;
+  
+}
+
+
+
+
+
+
+    </script>
+    <style type="text/css">
+
+
+
+#game {
+  width: 600px;
+  height: 375px;
+  border: solid 1px black;
+  margin: auto;
+}
+
+
+    </style>
+  </head>
+  <body>
+    <div id="game">
+      <div id="label"></div>
+    </div>
+    <input type="button" name="simulate" value="simulate" onclick="simulate()">
+    <input type="button" name="step" value="step" onclick="doStepAndShow(0)">
+    <input type="button" name="debug" value="debug" onclick="showDebugInfo()">
+  </body>
+</html>
