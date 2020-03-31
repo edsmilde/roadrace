@@ -1,0 +1,38 @@
+<html>
+  <head>
+    <title>Animation</title>
+    <script type="text/javascript">
+
+
+
+var spriteElement;
+
+function loadFrameRecursive(time, frame, frameCount) {
+  var frameName = "sprites/testframe_" + frame + ".png";
+  spriteElement.src = frameName;
+  var nextFrame = (frame + 1) % frameCount;
+  setTimeout('loadFrameRecursive(' + time + ', ' + nextFrame + ', ' + frameCount + ')', time);
+}
+
+
+var FRAME_COUNT=50;
+var FRAME_LENGTH_MS=13;
+
+function startAnimation() {
+  spriteElement = document.getElementById("sprite");
+  
+  loadFrameRecursive(FRAME_LENGTH_MS, 0, FRAME_COUNT);
+  
+}
+
+
+
+
+
+    </script>
+  </head>
+  <body>
+    <div><image id="sprite" src="sprites/testframe_0.png"></div>
+    <div><input type="button" name="btnAnimate" value="Animate" onclick="startAnimation()"></div>
+  </body>
+</html>
