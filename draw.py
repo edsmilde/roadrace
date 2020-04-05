@@ -3,6 +3,7 @@
 from PIL import Image, ImageDraw
 import math
 
+import players
 
 
 def degreesToRadians(degrees):
@@ -46,11 +47,13 @@ class BodyAttributes:
     self.hipWidth = 1.5
     self.shoulderWidth = 2
     self.headBottomHeight=3
-    self.headTopHeight=4.2
+    self.headTopHeight=4.7
     self.headBottomOffset=0.3
     self.headTopOffset=0.2
+    ## Ratios
     self.shortsFemurRatio=0.5
     self.shortsTorsoRatio=0.2
+    self.hairRadiusRatio=0.9
     ## Sizes
     self.hipRadius = 1.4
     self.kneeRadius = 1.0
@@ -63,11 +66,15 @@ class BodyAttributes:
     self.handRadius=1
     self.headTopRadius=1.6
     self.headBottomRadius=1.2
+    self.hairTopRadius = 0.4
+    self.hairMiddleRadius = 0.6
+    self.hairBottomRadius = 0.7
     ## Colors
-    self.skinColor=(78, 40, 25, 255)
-    self.singletColor=(220, 220, 220, 255)
-    self.shortsColor=(255, 140, 0, 255)
+    self.skinTone=(255, 230, 200, 255)
+    self.singletColor=(0, 160, 0, 255)
+    self.shortsColor=(10, 10, 10, 255)
     self.shoeColor=(0, 255, 0, 255)
+    self.hairColor=(170, 125, 100, 255)
 
 class BodyPositions:
   def __init__(self):
@@ -154,6 +161,9 @@ class BodyCoordinates:
     headOffsetAngle = bodyPositions.torsoToGroundAngle - degreesToRadians(90)
     self.headTop = self.torsoTop.plusXZAngleLength(bodyPositions.torsoToGroundAngle, bodyAttributes.headTopHeight).plusXZAngleLength(headOffsetAngle, bodyAttributes.headBottomOffset)
     self.headBottom = self.torsoTop.plusXZAngleLength(bodyPositions.torsoToGroundAngle, bodyAttributes.headBottomHeight).plusXZAngleLength(headOffsetAngle, bodyAttributes.headTopOffset)
+    self.hairTop = self.headTop.plusXZAngleLength(bodyPositions.torsoToGroundAngle - degreesToRadians(45), bodyAttributes.headTopRadius)
+    self.hairMiddle = self.headTop.plusXZAngleLength(bodyPositions.torsoToGroundAngle + degreesToRadians(20), bodyAttributes.headTopRadius * bodyAttributes.hairRadiusRatio)
+    self.hairBottom = self.headTop.plusXZAngleLength(bodyPositions.torsoToGroundAngle + degreesToRadians(105), bodyAttributes.headTopRadius * bodyAttributes.hairRadiusRatio * bodyAttributes.hairRadiusRatio)
   
   def toString(self):
     output = ""
@@ -291,23 +301,37 @@ def drawBody(bodyCoordinates, bodyAttributes, viewAngle, draw):
   headBottomCircle = Circle(headBottomCoordinates, headBottomRadius)
   headTopCircle = Circle(headTopCoordinates, headTopRadius)
   
+  ## Hair
+  hairTopCoordinates = viewAngle.coordinateToScreen(bodyCoordinates.hairTop)
+  hairMiddleCoordinates = viewAngle.coordinateToScreen(bodyCoordinates.hairMiddle)
+  hairBottomCoordinates = viewAngle.coordinateToScreen(bodyCoordinates.hairBottom)
+  hairTopRadius = viewAngle.sizeToScreen(bodyAttributes.hairTopRadius)
+  hairMiddleRadius = viewAngle.sizeToScreen(bodyAttributes.hairMiddleRadius)
+  hairBottomRadius = viewAngle.sizeToScreen(bodyAttributes.hairBottomRadius)
+  hairTopCircle = Circle(hairTopCoordinates, hairTopRadius)
+  hairMiddleCircle = Circle(hairMiddleCoordinates, hairMiddleRadius)
+  hairBottomCircle = Circle(hairBottomCoordinates, hairBottomRadius)
+  
+  
+  
+  
   
   ## Draw
   ### Left arm
-  interpolateCircles(leftShoulderCircle, leftElbowCircle, bodyAttributes.skinColor, RESOLUTION, draw)
-  interpolateCircles(leftElbowCircle, leftWristCircle, bodyAttributes.skinColor, RESOLUTION, draw)
-  plotCircle(leftHandCircle, bodyAttributes.skinColor, draw)
+  interpolateCircles(leftShoulderCircle, leftElbowCircle, bodyAttributes.skinTone, RESOLUTION, draw)
+  interpolateCircles(leftElbowCircle, leftWristCircle, bodyAttributes.skinTone, RESOLUTION, draw)
+  plotCircle(leftHandCircle, bodyAttributes.skinTone, draw)
   
   ### Left leg
-  interpolateCircles(leftKneeCircle, leftAnkleCircle, bodyAttributes.skinColor, RESOLUTION, draw)
-  interpolateCircles(leftKneeCircle, leftBottomShortsCircle, bodyAttributes.skinColor, RESOLUTION, draw)
+  interpolateCircles(leftKneeCircle, leftAnkleCircle, bodyAttributes.skinTone, RESOLUTION, draw)
+  interpolateCircles(leftKneeCircle, leftBottomShortsCircle, bodyAttributes.skinTone, RESOLUTION, draw)
   interpolateCircles(leftBottomShortsCircle, leftHipCircle, bodyAttributes.shortsColor, RESOLUTION, draw)
   interpolateCircles(leftAnkleCircle, leftToeCircle, bodyAttributes.shoeColor, RESOLUTION, draw)
   
   ### Right leg
-  interpolateCircles(rightKneeCircle, rightAnkleCircle, bodyAttributes.skinColor, RESOLUTION, draw)
+  interpolateCircles(rightKneeCircle, rightAnkleCircle, bodyAttributes.skinTone, RESOLUTION, draw)
   interpolateCircles(rightAnkleCircle, rightToeCircle, bodyAttributes.shoeColor, RESOLUTION, draw)
-  interpolateCircles(rightKneeCircle, rightBottomShortsCircle, bodyAttributes.skinColor, RESOLUTION, draw)
+  interpolateCircles(rightKneeCircle, rightBottomShortsCircle, bodyAttributes.skinTone, RESOLUTION, draw)
   interpolateCircles(rightBottomShortsCircle, rightHipCircle, bodyAttributes.shortsColor, RESOLUTION, draw)
   
   ### Torso
@@ -317,12 +341,18 @@ def drawBody(bodyCoordinates, bodyAttributes, viewAngle, draw):
   interpolateCircles(rightShortsTopCircle, rightShoulderTorsoCircle, bodyAttributes.singletColor, RESOLUTION, draw)
   
   ### Right arm
-  interpolateCircles(rightShoulderCircle, rightElbowCircle, bodyAttributes.skinColor, RESOLUTION, draw)
-  interpolateCircles(rightElbowCircle, rightWristCircle, bodyAttributes.skinColor, RESOLUTION, draw)
-  plotCircle(rightHandCircle, bodyAttributes.skinColor, draw)
+  interpolateCircles(rightShoulderCircle, rightElbowCircle, bodyAttributes.skinTone, RESOLUTION, draw)
+  interpolateCircles(rightElbowCircle, rightWristCircle, bodyAttributes.skinTone, RESOLUTION, draw)
+  plotCircle(rightHandCircle, bodyAttributes.skinTone, draw)
   
   ### Head
-  interpolateCircles(headBottomCircle, headTopCircle, bodyAttributes.skinColor, RESOLUTION, draw)
+  interpolateCircles(headBottomCircle, headTopCircle, bodyAttributes.skinTone, RESOLUTION, draw)
+  
+  ### Hair
+  if (bodyAttributes.hairColor[3] != 0):
+    interpolateCircles(hairTopCircle, hairMiddleCircle, bodyAttributes.hairColor, RESOLUTION, draw)
+    interpolateCircles(hairMiddleCircle, hairBottomCircle, bodyAttributes.hairColor, RESOLUTION, draw)
+  
   
   ## Lower legs
   ## Upper legs
@@ -331,7 +361,6 @@ def drawBody(bodyCoordinates, bodyAttributes, viewAngle, draw):
   ## Lower arms
   ## Head
   
-
 
 
 myViewAngle = ViewAngle(degreesToRadians(30), 5, 75, 200)
@@ -345,9 +374,9 @@ rightForwardBodyPositions = BodyPositions()
 
 rightForwardBodyPositions.torsoToGroundAngle = DEFAULT_TORSO_TO_GROUND_ANGLE
 rightForwardBodyPositions.torsoToGroundHeight = 13.66
-rightForwardBodyPositions.leftHipAngle = degreesToRadians(140)
-rightForwardBodyPositions.leftKneeAngle = degreesToRadians(105)
-rightForwardBodyPositions.rightHipAngle = degreesToRadians(245)
+rightForwardBodyPositions.leftHipAngle = degreesToRadians(120)
+rightForwardBodyPositions.leftKneeAngle = degreesToRadians(90)
+rightForwardBodyPositions.rightHipAngle = degreesToRadians(260)
 rightForwardBodyPositions.rightKneeAngle = degreesToRadians(135)
 rightForwardBodyPositions.leftElbowAngle = degreesToRadians(50)
 rightForwardBodyPositions.rightElbowAngle = degreesToRadians(120)
@@ -362,7 +391,7 @@ rightPlantBodyPositions.torsoToGroundAngle = DEFAULT_TORSO_TO_GROUND_ANGLE
 rightPlantBodyPositions.torsoToGroundHeight = 13.89
 rightPlantBodyPositions.rightHipAngle = degreesToRadians(200)
 rightPlantBodyPositions.rightKneeAngle = degreesToRadians(155)
-rightPlantBodyPositions.rightAnkleAngle = degreesToRadians(80)
+rightPlantBodyPositions.rightAnkleAngle = degreesToRadians(70)
 rightPlantBodyPositions.rightShoulderAngle = degreesToRadians(15)
 rightPlantBodyPositions.rightElbowAngle = degreesToRadians(105)
 rightPlantBodyPositions.leftHipAngle = degreesToRadians(180)
@@ -417,27 +446,47 @@ framesAfter = [10, 5, 10, 10, 5, 10]
 
 FRAMES_PER_POSITION=10
 
-frameCount = 0
+#frameCount = 0
 
 #frames = []
 
 
+drawnCount = 0
 
-for i in range(len(bodyPositionsSet)):
-  numFrames = framesAfter[i]
-  for j in range(numFrames):
-    filename = "sprites/testframe_" + str(frameCount) + ".png"
-    bodyPositionsStart = bodyPositionsSet[i]
-    bodyPositionsEnd = bodyPositionsSet[(i+1) % len(bodyPositionsSet)]
-    interpolateRatio = j/FRAMES_PER_POSITION
-    bodyPositionsToPlot = bodyPositionsStart.interpolateWith(bodyPositionsEnd, interpolateRatio)
-    bodyCoordinatesToPlot = BodyCoordinates(myBodyAttributes, bodyPositionsToPlot)
-    image = Image.new('RGBA', (150, 300), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(image)
-    drawBody(bodyCoordinatesToPlot, myBodyAttributes, myViewAngle, draw)
-#    frames.append(image)
-    image.save(filename, "PNG")
-    frameCount += 1
+lookCount = 0
+for commonLook in players.commonLooks:
+  kitCount = 0
+  for professionalKit in players.professionalKits:
+    thisBodyAttributes = BodyAttributes()
+    thisBodyAttributes.singletColor = players.professionalKits[professionalKit].singletColor
+    thisBodyAttributes.shortsColor = players.professionalKits[professionalKit].shortsColor
+    thisBodyAttributes.shoeColor = players.professionalKits[professionalKit].shoeColor
+    thisBodyAttributes.skinTone = commonLook.skinTone
+    thisBodyAttributes.hairColor = commonLook.hairColor
+    frameCount = 0
+    for i in range(len(bodyPositionsSet)):
+      numFrames = framesAfter[i]
+      for j in range(numFrames):
+        filename = "sprites/" + str(kitCount) + "_" + str(lookCount) + "_" + str(frameCount) + ".png"
+        bodyPositionsStart = bodyPositionsSet[i]
+        bodyPositionsEnd = bodyPositionsSet[(i+1) % len(bodyPositionsSet)]
+        interpolateRatio = j/FRAMES_PER_POSITION
+        bodyPositionsToPlot = bodyPositionsStart.interpolateWith(bodyPositionsEnd, interpolateRatio)
+        bodyCoordinatesToPlot = BodyCoordinates(thisBodyAttributes, bodyPositionsToPlot)
+        image = Image.new('RGBA', (150, 300), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(image)
+        drawBody(bodyCoordinatesToPlot, thisBodyAttributes, myViewAngle, draw)
+    #    frames.append(image)
+        image.save(filename, "PNG")
+        frameCount += 1
+    kitCount += 1
+    drawnCount += 1
+  lookCount += 1
+  print("Drawn: " + str(drawnCount))
+
+
+
+
 
 #frames[0].save("sprites/test.gif", format="GIF", append_images=frames[1:], save_all=True, duration=100, loop=0)
 
@@ -446,4 +495,6 @@ for i in range(len(bodyPositionsSet)):
 #drawBody(rightToeoffBodyCoordinates, myBodyAttributes, myViewAngle, draw)
 
 #image.show()
+
+
 

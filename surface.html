@@ -1,0 +1,46 @@
+<html>
+  <head>
+    <title>Animation</title>
+    <script type="text/javascript">
+
+var HEIGHT = 10;
+var WIDTH = 2;
+
+var IMAGE_SIZE=400;
+var OVERLAP_SIZE=20;
+var SCALE_X = 1;
+var SCALE_Y = 1;
+
+var NUM_SPRITES=20;
+
+function showGround() {
+  var groundElement = document.getElementById("ground");
+  
+  var topLeftImage = document.createElement("img");
+  topLeftImage.setAttribute("src", "sprites/ground/asphalt_topLeft.png");
+  topLeftImage.style.width = OVERLAP_SIZE;
+  for (var i = 0; i < WIDTH; i++) {
+    
+    for (var j = 0; j < HEIGHT; j++) {
+      
+      
+      
+      
+    }
+  
+  
+  }
+  
+  
+}
+
+
+
+
+    </script>
+  </head>
+  <body>
+    <div><input type="button" name="btnShowGround" value="show ground" onclick="showGround();"></div>
+    <div id="ground"></div>
+  </body>
+</html>

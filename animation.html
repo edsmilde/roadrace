@@ -7,8 +7,11 @@
 
 var spriteElement;
 
+var baseKit = 0;
+var baseLook = 0;
+
 function loadFrameRecursive(time, frame, frameCount) {
-  var frameName = "sprites/testframe_" + frame + ".png";
+  var frameName = "sprites/" + baseKit + "_" + baseLook + "_" + frame + ".png";
   spriteElement.src = frameName;
   var nextFrame = (frame + 1) % frameCount;
   setTimeout('loadFrameRecursive(' + time + ', ' + nextFrame + ', ' + frameCount + ')', time);
@@ -20,11 +23,29 @@ var FRAME_LENGTH_MS=13;
 
 function startAnimation() {
   spriteElement = document.getElementById("sprite");
+  baseKit = document.getElementById("txtKit").value;
+  baseLook = document.getElementById("txtLook").value;
   
   loadFrameRecursive(FRAME_LENGTH_MS, 0, FRAME_COUNT);
   
 }
 
+var NUM_KITS = 12;
+var NUM_LOOKS = 15;
+
+function showAll() {
+  var display = document.getElementById("allImages");
+
+  for (var i = 0; i < NUM_KITS; i++) {
+    for (var j = 0; j < NUM_LOOKS; j++) {
+      var imagePath = "sprites/" + i + "_" + j + "_0.png";
+      var imageElement = document.createElement("img");
+      imageElement.setAttribute("src", imagePath);
+      display.appendChild(imageElement);
+    }
+    display.appendChild(document.createElement("br"));
+  }
+}
 
 
 
@@ -32,7 +53,11 @@ function startAnimation() {
     </script>
   </head>
   <body>
-    <div><image id="sprite" src="sprites/testframe_0.png"></div>
+    <div><image id="sprite" src="sprites/0_0_0.png"></div>
     <div><input type="button" name="btnAnimate" value="Animate" onclick="startAnimation()"></div>
+    <div><input type="text" name="txtKit" id="txtKit" value="0"></div>
+    <div><input type="text" name="txtLook" id="txtLook" value="0"></div>
+    <div><input type="button" name="btnShowAll" value="Show All" onclick="showAll()"></div>
+    <div id="allImages"></div>
   </body>
 </html>

@@ -103,7 +103,8 @@ var MIN_TARGET_DISTANCE=1;
 var MIN_SURGE_AVOID_DISTANCE=1;
 var SURGE_AVERAGE_LENGTH=40;
 
-var SURGE_DECISION_RATIO=0.8;
+var KICK_DECISION_RATIO=0.8;
+var IMPATIENCE_FACTOR=50;
 var DRAFT_DECISION_LENGTH=7;
 
 function moveOption(move, potential) {
@@ -139,7 +140,12 @@ function simulateStep(numFinished) {
       if (!willSurge) {
         var distanceToFinish = FINISH_DISTANCE - players[i].position.x;
         var energyToFinish = distanceToFinish / BASE_VELOCITY / SURGE_RATIO;
-        var surgeChance = SURGE_DECISION_RATIO * (players[i].energy*players[i].energy) / (energyToFinish*energyToFinish);
+        var surgeChance = IMPATIENCE_FACTOR / SURGE_AVERAGE_LENGTH * (players[i].energy*players[i].energy) / (energyToFinish*energyToFinish);
+        if (Math.random() < surgeChance) {
+          willSurge = true;
+        }
+        // If nearing the end, kick
+        var kickChance = KICK_DECISION_RATIO * (players[i].energy*players[i].energy) / (energyToFinish*energyToFinish);
         if (Math.random() < surgeChance) {
           willSurge = true;
         }
@@ -473,7 +479,38 @@ function showDebugInfo() {
 }
 
 
+var NUM_SIMS = 1000;
 
+function simulateBulk() {
+  var wins = new Array();
+  for (var i = 0; i < NUM_PLAYERS; i++) {
+    wins[i] = 0;
+  }
+  for (var i = 0; i < NUM_SIMS; i++) {
+    init();
+//    players[4].energy = 500;
+    while (true) {
+      numFinished = simulateStep(0);
+      if (numFinished) {
+        // check who won
+        for (var j = 0; j < NUM_PLAYERS; j++) {
+          if (players[j].finished) {
+            wins[j]++;
+            break;
+          }
+        }
+        break;
+      }
+    }
+  }
+  var output = "";
+  // show result
+  for (var i = 0; i < NUM_PLAYERS; i++) {
+    output += i + ": ";
+    output += wins[i] + "<br>";
+  }
+  document.getElementById("label").innerHTML = output;
+}
 
 
 
@@ -499,5 +536,6 @@ function showDebugInfo() {
     <input type="button" name="btnSimulate" value="simulate" onclick="simulate()">
     <input type="button" name="step" value="step" onclick="doStepAndShow(0)">
     <input type="button" name="debug" value="debug" onclick="showDebugInfo()">
+    <input type="button" name="btnBulk" value="bulk sim" onclick="simulateBulk()">
   </body>
 </html>
