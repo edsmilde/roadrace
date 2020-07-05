@@ -1,35 +1,124 @@
 <html>
   <head>
     <title>Animation</title>
+    <style type="text/css">
+
+
+#ground {
+  position: absolute;
+  top: 50;
+  left: 50;
+}
+
+
+
+    </style>
     <script type="text/javascript">
 
-var HEIGHT = 10;
+var HEIGHT = 2;
 var WIDTH = 2;
 
-var IMAGE_SIZE=400;
-var OVERLAP_SIZE=20;
+var IMAGE_SIZE=300;
+var OVERLAP_SIZE=5;
 var SCALE_X = 1;
 var SCALE_Y = 1;
 
-var NUM_SPRITES=20;
+
+var SPRITE_PATH = "sprites/ground/grass_";
+var SPRITE_END = ".png"
+
+function getNewBlock(width, height, left, top, path) {
+  var block = document.createElement("img");
+  block.setAttribute("src", path);
+  block.style.width = width;
+  block.style.height = height;
+  block.style.left = left;
+  block.style.top = top;
+  block.style.position = "absolute";
+  return block;
+}
+
+function getNewLeftBlock(left, top) {
+  var path = SPRITE_PATH + "left" + SPRITE_END;
+  return getNewBlock(OVERLAP_SIZE, IMAGE_SIZE, left, top, path);
+}
+
+function getNewRightBlock(left, top) {
+  var path = SPRITE_PATH + "right" + SPRITE_END;
+  return getNewBlock(OVERLAP_SIZE, IMAGE_SIZE, left, top, path);
+}
+
+function getNewTopBlock(left, top) {
+  var path = SPRITE_PATH + "top" + SPRITE_END;
+  return getNewBlock(IMAGE_SIZE, OVERLAP_SIZE, left, top, path);
+}
+
+function getNewBottomBlock(left, top) {
+  var path = SPRITE_PATH + "bottom" + SPRITE_END;
+  return getNewBlock(IMAGE_SIZE, OVERLAP_SIZE, left, top, path);
+}
+
+function getNewCenterBlock(left, top) {
+  var path = SPRITE_PATH + "center" + SPRITE_END;
+  return getNewBlock(IMAGE_SIZE, IMAGE_SIZE, left, top, path);
+}
+
+
+function getNewCornerBlock(left, top, corner) {
+  var path = SPRITE_PATH + corner + SPRITE_END;
+  return getNewBlock(OVERLAP_SIZE, OVERLAP_SIZE, left, top, path);
+}
+
 
 function showGround() {
   var groundElement = document.getElementById("ground");
   
-  var topLeftImage = document.createElement("img");
-  topLeftImage.setAttribute("src", "sprites/ground/asphalt_topLeft.png");
-  topLeftImage.style.width = OVERLAP_SIZE;
+  var topLeftBlock = getNewCornerBlock(0, 0, "topLeft");
+  groundElement.appendChild(topLeftBlock);
+  
+  
+  for (var j = 0; j < HEIGHT; j++) {
+    var top = j*IMAGE_SIZE + OVERLAP_SIZE;
+    var leftBlock = getNewLeftBlock(0, top);
+    groundElement.appendChild(leftBlock);
+  }
+  
+  var bottom = HEIGHT*IMAGE_SIZE + OVERLAP_SIZE;
+  
+  var bottomLeftBlock = getNewCornerBlock(0, bottom, "bottomLeft");
+  groundElement.appendChild(bottomLeftBlock);
+  
   for (var i = 0; i < WIDTH; i++) {
+    var left = i*IMAGE_SIZE + OVERLAP_SIZE;
+    var topBlock = getNewTopBlock(left, 0);
+    groundElement.appendChild(topBlock);
+    
     
     for (var j = 0; j < HEIGHT; j++) {
-      
-      
-      
-      
+      var top = j*IMAGE_SIZE + OVERLAP_SIZE;
+      var centerBlock = getNewCenterBlock(left, top);
+      groundElement.appendChild(centerBlock);
     }
-  
-  
+    
+    var bottomBlock = getNewBottomBlock(left, bottom);
+    groundElement.appendChild(bottomBlock);
   }
+  
+  var right = OVERLAP_SIZE + WIDTH*IMAGE_SIZE;
+  
+  var topRightBlock = getNewCornerBlock(right, 0, "topRight");
+  groundElement.appendChild(topRightBlock);
+  
+  
+  for (var j = 0; j < HEIGHT; j++) {
+    var top = j*IMAGE_SIZE + OVERLAP_SIZE;
+    var rightBlock = getNewRightBlock(right, top);
+    groundElement.appendChild(rightBlock);
+  }
+  
+  var bottomRightBlock = getNewCornerBlock(right, bottom, "bottomRight");
+  groundElement.appendChild(bottomRightBlock);
+  
   
   
 }

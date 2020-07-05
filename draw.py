@@ -467,7 +467,7 @@ for commonLook in players.commonLooks:
     for i in range(len(bodyPositionsSet)):
       numFrames = framesAfter[i]
       for j in range(numFrames):
-        filename = "sprites/" + str(kitCount) + "_" + str(lookCount) + "_" + str(frameCount) + ".png"
+        filename = "sprites/player/" + str(kitCount) + "_" + str(lookCount) + "_" + str(frameCount) + ".png"
         bodyPositionsStart = bodyPositionsSet[i]
         bodyPositionsEnd = bodyPositionsSet[(i+1) % len(bodyPositionsSet)]
         interpolateRatio = j/FRAMES_PER_POSITION

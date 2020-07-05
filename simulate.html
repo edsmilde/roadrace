@@ -6,121 +6,12 @@
 
 
 
-var globalBackgroundPieces = new Array();
-
-
 
 function Point(x, y) {
   this.x = x;
   this.y = y;
   this.toString = function() { return("(" + this.x + "," + this.y + ")"); };
 }
-
-
-
-
-var globalViewAttributes = {
-  gameCenter: {
-    x: 0,
-    y: 0
-  },
-  screenCenter: {
-    x: 300,
-    y: 250
-  },
-  scale: {
-    x: 4,
-    y: 2
-  },
-  screenDimensions: {
-    width: 600,
-    height: 500
-  }
-}
-
-function pointToScreen(point) {
-  var dx = point.x - globalViewAttributes.gameCenter.x;
-  var dy = point.y - globalViewAttributes.gameCenter.y;
-  var screenX = globalViewAttributes.screenCenter.x + globalViewAttributes.scale.x*dx;
-  var screenY = globalViewAttributes.screenCenter.y + globalViewAttributes.scale.y*dy;
-  return new Point(screenX, screenY);
-};
-
-
-function screenPositionVisible(topLeftScreen, width, height) {
-  var bottomRightScreen = new Point(topLeftScreen.x + width, topLeftScreen.y + height);
-  if (topLeftScreen.x < globalViewAttributes.screenDimensions.width
-    && bottomRightScreen.x > 0
-    && topLeftScreen.y < globalViewAttributes.screenDimensions.height
-    && bottomRightScreen.y > 0) {
-    return true;
-  }
-  return false;
-}
-
-function pointVisibleOnScreen(topLeft, width, height) {
-  var topLeftScreen = pointToScreen(topLeft);
-  var bottomRight = new Point(topLeft.x + width, topLeft.y + height);
-  var bottomRightScreen = pointToScreen(bottomRight);
-  if (topLeftScreen.x < globalViewAttributes.screenDimensions.width
-    && bottomRightScreen.x > 0
-    && topLeftScreen.y < globalViewAttributes.screenDimensions.height
-    && bottomRightScreen.y > 0) {
-    return true;
-  }
-  return false;
-}
-
-function widthToScreen(width) {
-  return width * globalViewAttributes.scale.x;
-}
-
-function heightToScreen(height) {
-  return height * globalViewAttributes.scale.y;
-}
-
-
-
-
-function BackgroundPiece(position, width, height, spritePath, zIndex) {
-  this.position = position;
-  this.width = width;
-  this.height = height;
-  this.spritePath = spritePath;
-  this.created = false;
-  this.zIndex = zIndex;
-  this.element = null;
-  this.render = function(screenElement) {
-    var screenPosition = pointToScreen(this.position);
-    var screenWidth = widthToScreen(width);
-    var screenHeight = heightToScreen(height);
-    if (screenPositionVisible(screenPosition, screenWidth, screenHeight)) {
-      if (!this.created) {
-        this.element = document.createElement("img");
-        this.element.setAttribute("src", spritePath);
-        this.element.style.width = screenWidth;
-        this.element.style.height = screenHeight;
-        this.element.style.position = "absolute";
-        this.element.style.zIndex = this.zIndex;
-      }
-      this.element.style.left = screenPosition.x;
-      this.element.style.top = screenPosition.y;
-      if (!this.created) {
-        screenElement.appendChild(this.element);
-        this.created = true;
-      }
-    } else if (this.created) {
-      this.hide();
-    }
-  };
-  this.hide = function() {
-    this.element.style.display = "none";
-    this.element.remove();
-  }
-}
-
-
-
 
 function Move(speed, direction, intent) {
   this.speed = speed;
@@ -137,243 +28,50 @@ var DIRECTION_RIGHT = 2;
 var INTENT_DRAFT = 0;
 var INTENT_SURGE = 1;
 
-var PLAYER_SPRITE_OFFSET = {x: 40, y: 110};
-var PLAYER_SPRITE_SIZE = {width: 80, height: 160};
 
-var FRAMES_PER_STRIDE = 50;
-
-function Player(position, contactDirection, nextMove, energy, spriteBase, strideTime, screenElement, playerId) {
+function Player(position, contactDirection, nextMove, energy, element) {
   this.position = position;
   this.contactDirection = contactDirection;
   this.nextMove = nextMove;
   this.energy = energy;
-  this.spriteBase = spriteBase;
-  this.strideTime = strideTime;
-  this.stridePhase = 0;
-  this.element = document.createElement("img");
-  this.element.setAttribute("src", spriteBase + "25.png");
-  this.element.setAttribute("id", "player-" + playerId);
-  var screenPosition = pointToScreen(this.position);
-  this.element.style.left = screenPosition.x - PLAYER_SPRITE_OFFSET.x;
-  this.element.style.top = screenPosition.y - PLAYER_SPRITE_OFFSET.y;
-  this.element.style.width = PLAYER_SPRITE_SIZE.width;
-  this.element.style.height = PLAYER_SPRITE_SIZE.height;
-  this.element.style.zIndex = this.position.y;
-  this.element.style.position = "absolute";
-  screenElement.appendChild(this.element);
+  this.element = element;
   this.finished = false;
   this.rank = 0;
   this._log = "";
-  this.incrementStride = function(time, cadence) {
-    this.stridePhase = (this.stridePhase + time*cadence) % this.strideTime;
-  }
-  this.render = function(screenElement) {
-    var screenPosition = pointToScreen(this.position);
-    this.element.style.left = screenPosition.x - PLAYER_SPRITE_OFFSET.x;
-    this.element.style.top = screenPosition.y - PLAYER_SPRITE_OFFSET.y;
-    this.element.style.zIndex = this.position.y;
-    var relativeStridePhase = this.stridePhase / this.strideTime;
-    var frame = Math.floor(relativeStridePhase * FRAMES_PER_STRIDE);
-    var sprite = spriteBase + frame + ".png";
-    this.element.setAttribute("src", sprite);
-  }
 }
 
-var ROAD_WIDTH=200;
-var NUM_PLAYERS=9;
-var USER_PLAYER = 4;
-var CENTER_PLAYER = USER_PLAYER;
+var ROAD_WIDTH=160;
+var NUM_PLAYERS=20;
 var START_ENERGY=400;
 
 var players = new Array();
 
 var gameWindow;
 
-var GROUND_SPRITES_PATH_BASE = "sprites/ground/";
-
-function getGroundSpritePath(surface, position) {
-  return GROUND_SPRITES_PATH_BASE + surface + "_" + position + ".png";
-}
-
-
-
-function initBackground() {
-  globalBackgroundPieces = new Array();
-  // Create road
-  //
-  // Center road pieces
-  //
-  var roadStartLeft = -100;
-  var roadStartTop = -100;
-  var roadBlockHeight = 50;
-  var roadBlockWidth = 50;
-  
-  var roadEndRight = 5100;
-  var roadEndBottom = 100;
-  
-  for (var left = roadStartLeft; left < roadEndRight; left += roadBlockWidth) {
-    for (var top = roadStartTop; top < roadEndBottom; top += roadBlockHeight) {
-      var thisPosition = new Point(left, top);
-      var thisSprite = getGroundSpritePath("asphalt", "center");
-      var thisPiece = new BackgroundPiece(thisPosition, roadBlockWidth, roadBlockWidth, thisSprite, -1000);
-      globalBackgroundPieces.push(thisPiece);
-    }
-  }
-  
-  // Road edges
-  //
-  var roadEdgeHeight = 2.5;
-  for (var left = roadStartLeft; left < roadEndRight; left += roadBlockWidth) {
-    // Top
-    //
-    var thisTopPosition = new Point(left, roadStartTop - roadEdgeHeight);
-    var thisTopSprite = getGroundSpritePath("asphalt", "top");
-    thisTopPiece = new BackgroundPiece(thisTopPosition, roadBlockWidth, roadEdgeHeight, thisTopSprite, -1000);
-    globalBackgroundPieces.push(thisTopPiece);
-    var thisBottomPosition = new Point(left, roadEndBottom);
-    var thisBottomSprite = getGroundSpritePath("asphalt", "bottom");
-    var thisBottomPiece = new BackgroundPiece(thisBottomPosition, roadBlockWidth, roadEdgeHeight, thisBottomSprite, -1000);
-    globalBackgroundPieces.push(thisBottomPiece);
-    
-  }
-  
-  // Create backdrop
-  //
-  var grassBlockHeight = 100;
-  var grassBlockWidth = 100;
-  var grassAboveTop = roadStartTop - grassBlockHeight;
-  var grassBelowTop = roadEndBottom;
-  for (var left = roadStartLeft; left < roadEndRight; left += grassBlockWidth) {
-    // Above
-    //
-    var thisAbovePosition = new Point(left, grassAboveTop);
-    var thisBelowPosition = new Point(left, grassBelowTop);
-    var thisSprite = getGroundSpritePath("grass", "center")
-    var thisAbovePiece = new BackgroundPiece(thisAbovePosition, grassBlockWidth, grassBlockHeight, thisSprite, -1001);
-    var thisBelowPiece = new BackgroundPiece(thisBelowPosition, grassBlockWidth, grassBlockHeight, thisSprite, -1001);
-    globalBackgroundPieces.push(thisAbovePiece);
-    globalBackgroundPieces.push(thisBelowPiece);
-    
-    
-  }
-  
-  
-}
-
-
 function init() {
   gameWindow = document.getElementById('game');
-  
-  // Draw background
-  initBackground();
-  
-  for (var i = 0; i < globalBackgroundPieces.length; i++) {
-    globalBackgroundPieces[i].render(gameWindow);
-  }
-  
   // Create players
   //
   for (var i = 0; i < NUM_PLAYERS; i++) {
     var x = 0;
-    var y = (i+0.5)/NUM_PLAYERS*ROAD_WIDTH - ROAD_WIDTH/2;
+    var y = (i+0.5)/NUM_PLAYERS*ROAD_WIDTH;
     var position = new Point(x, y);
     var contactDirection = new Point(0, 0);
     var move = new Move(SPEED_BASE, DIRECTION_STRAIGHT, INTENT_DRAFT);
-    /*
     var element = document.createElement('div');
     element.style.width = 6;
     element.style.height = 6;
     element.style.backgroundColor = rgb(rand256(), rand256(), rand256());
     element.style.position = 'absolute';
-    element.style.zIndex = 0;
-    
-    var screenPosition = pointToScreen(position);
-    element.style.left = screenPosition.x;
-    element.style.top = screenPosition.y;
-    
     gameWindow.appendChild(element);
     element.setAttribute('id', 'player-' + i);
-    */
     
-    var look = Math.floor(Math.random()*14);
-    var kit = Math.floor(Math.random()*13);
-    
-    var spriteBase = "sprites/player/" + kit + "_" + look + "_";
-    
-    var strideTime = 500 + Math.floor(100*Math.random());
-    
-    var player = new Player(position, contactDirection, move, START_ENERGY, spriteBase, strideTime, gameWindow, i);
+    var player = new Player(position, contactDirection, move, START_ENERGY, element);
     players[i] = player;
   }
   
-  
-  
 
 }
-
-
-var playerKeyStates = {
-  left: false,
-  right: false,
-  up: false,
-  down: false
-}
-
-function loadPage() {
-
-  // Keys
-  
-  document.addEventListener('keydown', handleKeyDown);
-  document.addEventListener('keyup', handleKeyUp);
-}
-
-function handleKeyDown(event) {
-  switch(event.keyCode) {
-    case 37:
-      // left
-      playerKeyStates.left = true;
-      break;
-    case 38:
-      // up
-      playerKeyStates.up = true;
-      break;
-      
-    case 39:
-      // right
-      playerKeyStates.right = true;
-      break;
-      
-    case 40:
-      playerKeyStates.down = true;
-      // down
-      break;
-      
-  }
-}
-
-function handleKeyUp(event) {
-  switch(event.keyCode) {
-    case 37:
-      // left
-      playerKeyStates.left = false;
-      break;
-    case 38:
-      // up
-      playerKeyStates.up = false;
-      break;
-      
-    case 39:
-      // right
-      playerKeyStates.right = false;
-      break;
-      
-    case 40:
-      playerKeyStates.down = false;
-      // down
-      break;
-  }
-}
-
 
 function distanceSquared(pointA, pointB) {
   var dx = pointA.x - pointB.x;
@@ -390,32 +88,29 @@ function orthogonalDistance(pointA, pointB) {
 }
 
 var SIM_STEP_TIME_MS = 25;
-var BASE_VELOCITY = 2;
-var SURGE_RATIO = 1.4;
+var BASE_VELOCITY = 5;
+var SURGE_RATIO = 1.2;
 var STEER_RATIO = 0.2;
 var STEER_SLOWDOWN_RATIO = Math.sqrt(1 - STEER_RATIO*STEER_RATIO);
 var FINISH_DISTANCE=5000;
-var PLAYER_RADIUS=6;
-var DRAFT_LENGTH=12;
-var DRAFT_WIDTH=12;
+var PLAYER_RADIUS=3;
+var DRAFT_LENGTH=10;
+var DRAFT_WIDTH=10;
 var DRAFT_ENERGY_RATIO=0.5;
 var SLOW_ENERGY_GAIN=0.8;
 
 var MIN_TARGET_DISTANCE=1;
 var MIN_SURGE_AVOID_DISTANCE=1;
-var SURGE_AVERAGE_LENGTH=80;
+var SURGE_AVERAGE_LENGTH=40;
 
 var KICK_DECISION_RATIO=0.8;
-var IMPATIENCE_FACTOR=10;
+var IMPATIENCE_FACTOR=50;
 var DRAFT_DECISION_LENGTH=7;
-
-var MAX_KICK_BOOST = 1.2;
 
 function moveOption(move, potential) {
   this.move = move;
   this.potential = potential;
 }
-
 
 
 function simulateStep(numFinished) {
@@ -426,38 +121,6 @@ function simulateStep(numFinished) {
     if (players[i].finished) {
       continue;
     }
-    
-    if (i == USER_PLAYER) {
-      // Check direction
-      if (playerKeyStates.up && !playerKeyStates.down) {
-        players[i].nextMove.direction = DIRECTION_RIGHT;
-      } else if (playerKeyStates.down && !playerKeyStates.up) {
-        players[i].nextMove.direction = DIRECTION_LEFT;
-      } else {
-        players[i].nextMove.direction = DIRECTION_STRAIGHT;
-      }
-      
-      // Check speed
-      if (playerKeyStates.right && !playerKeyStates.left) {
-        if (players[i].energy >= 1) {
-          players[i].nextMove.intent = INTENT_SURGE;
-          players[i].nextMove.speed = SPEED_SURGE;
-        } else {
-          players[i].nextMove.intent = INTENT_DRAFT;
-          players[i].nextMove.speed = SPEED_BASE;
-        }
-      } else if (playerKeyStates.left && !playerKeyStates.right) {
-          players[i].nextMove.intent = INTENT_DRAFT;
-          players[i].nextMove.speed = SPEED_SLOW;
-      } else {
-          players[i].nextMove.intent = INTENT_DRAFT;
-          players[i].nextMove.speed = SPEED_BASE;
-      }
-      
-      continue;
-    }
-    
-    
     if (players[i].energy >= 1) {
       var willSurge = false;
       
@@ -621,16 +284,8 @@ function simulateStep(numFinished) {
     var thisMove = players[i].nextMove;
     var thisDelta = new Point(0, 0)
     if (thisMove.speed == SPEED_SURGE) {
-      var energyToFinish = (FINISH_DISTANCE-players[i].position.x)/BASE_VELOCITY/SURGE_RATIO;
-      var extraKickFactor = 1;
-      if (energyToFinish < players[i].energy) {
-        extraKickFactor = Math.sqrt(players[i].energy/energyToFinish);
-        if (extraKickFactor > MAX_KICK_BOOST) {
-          extraKickFactor = MAX_KICK_BOOST;
-        }
-      }
-      velocity = BASE_VELOCITY*SURGE_RATIO*extraKickFactor;
-      players[i].energy -= 1*extraKickFactor;
+      velocity = BASE_VELOCITY*SURGE_RATIO;
+      players[i].energy -= 1;
     } else if (thisMove.speed == SPEED_SLOW) {
       velocity = BASE_VELOCITY/SURGE_RATIO;
       players[i].energy += SLOW_ENERGY_GAIN;
@@ -651,10 +306,10 @@ function simulateStep(numFinished) {
     players[i].position.y += thisDelta.y;
     
     // Stay on road
-    if (players[i].position.y < -ROAD_WIDTH/2) {
-      players[i].position.y = -ROAD_WIDTH/2;
-    } else if (players[i].position.y > ROAD_WIDTH/2) {
-      players[i].position.y = ROAD_WIDTH/2;
+    if (players[i].position.y < 0) {
+      players[i].position.y = 0;
+    } else if (players[i].position.y > ROAD_WIDTH) {
+      players[i].position.y = ROAD_WIDTH;
     }
     
     
@@ -749,19 +404,14 @@ function ScreenPosition(left, top) {
   this.left = left;
 }
 
-
-
-
 var BASE_BOTTOM=300;
 var BASE_LEFT=400;
 var POINT_TO_SCREEN_RATIO_X=1;
 var POINT_TO_SCREEN_RATIO_Y=1;
 
 
+var CENTER_PLAYER=10;
 
-
-
-/*
 function pointToScreen(point) {
   var left = BASE_LEFT + (point.x - players[CENTER_PLAYER].position.x) * POINT_TO_SCREEN_RATIO_X;
   var top = BASE_BOTTOM - point.y * POINT_TO_SCREEN_RATIO_Y;
@@ -769,44 +419,19 @@ function pointToScreen(point) {
   //var top = gameWindow.style.top + BASE_BOTTOM - point.y * POINT_TO_SCREEN_RATIO_Y;
   return new ScreenPosition(left, top); 
 }
-*/
+
 
 function animate() {
-  // Re-center horizontally around player #10
-  //
-  globalViewAttributes.gameCenter.x = players[CENTER_PLAYER].position.x;
-  // Position background
-  //
-  for (var i = 0; i < globalBackgroundPieces.length; i++) {
-    globalBackgroundPieces[i].render(gameWindow);
-  }
-
   // Position players
   //
   for (var i = 0; i < NUM_PLAYERS; i++) {
-    var cadence = 1;
-    if (players[i].nextMove.speed == SPEED_SURGE) {
-      cadence = SURGE_RATIO;
-    } else if (players[i].nextMove.speed == SPEED_SLOW) {
-      cadence = 1/SURGE_RATIO;
-    }
-    players[i].incrementStride(SIM_STEP_TIME_MS, cadence);
-    players[i].render(gameWindow);
+    var thisScreenPosition = pointToScreen(players[i].position);
+    
+    players[i].element.style.top = thisScreenPosition.top;
+    players[i].element.style.left = thisScreenPosition.left;
     
     
   }
-  
-  // Update info bar
-  //
-  var distanceRatio = players[USER_PLAYER].position.x / FINISH_DISTANCE;
-  var distancePercent = Math.floor(distanceRatio*100);
-  document.getElementById("distancePercent").innerHTML = distancePercent;
-  
-  var userEnergy = players[USER_PLAYER].energy;
-  var ENERGY_DISPLAY_RATIO = 0.5;
-  var energyMeterWidth = userEnergy*ENERGY_DISPLAY_RATIO;
-  document.getElementById("energyMeterGreen").style.width = energyMeterWidth;
-  
 }
 
 
@@ -814,7 +439,7 @@ function animate() {
 function simulate() {
   init();
   
-//  testDisplay();
+  testDisplay();
   animate();
   
 }
@@ -896,63 +521,21 @@ function simulateBulk() {
 
 #game {
   width: 600px;
-  height: 500px;
+  height: 375px;
   border: solid 1px black;
-  position: absolute;
-  top: 100;
-  left: 100;
-  overflow: hidden;
+  margin: auto;
 }
 
-
-#bar {
-  position: absolute;
-  top: 50;
-  left: 100;
-}
-
-#energyMeter, #energyMeterGreen {
-  border: 0;
-  margin: 0;
-  padding: 0;
-  height: 25px;
-}
-
-#energyMeter {
-  background-color: #550000;
-  width: 600px;
-  overflow: hidden;
-}
-
-#energyMeterGreen {
-  background-color: #00aa00;
-  width: 200px;
-  display: inline-block;
-}
-
-#controls {
-  position: absolute;
-  top: 650;
-  left: 100;
-}
 
     </style>
   </head>
-  <body onload="loadPage()">
-    <div id="bar">
-      <div id="energyMeter">
-        <div id="energyMeterGreen"></div>
-      </div>
-      <div id="distance">Distance: <span id="distancePercent">0</span>%</div>
-    </div>
+  <body>
     <div id="game">
       <div id="label"></div>
     </div>
-    <div id="controls">
-      <input type="button" name="btnSimulate" value="simulate" onclick="simulate()">
-      <input type="button" name="step" value="start" onclick="doStepAndShow(0)">
-      <input type="button" name="debug" value="debug" onclick="showDebugInfo()">
-      <input type="button" name="btnBulk" value="bulk sim" onclick="simulateBulk()">
-    </div>
+    <input type="button" name="btnSimulate" value="simulate" onclick="simulate()">
+    <input type="button" name="step" value="step" onclick="doStepAndShow(0)">
+    <input type="button" name="debug" value="debug" onclick="showDebugInfo()">
+    <input type="button" name="btnBulk" value="bulk sim" onclick="simulateBulk()">
   </body>
 </html>

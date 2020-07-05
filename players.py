@@ -37,8 +37,8 @@ commonLooks.append(Look('medium', 'black'))
 commonLooks.append(Look('medium', 'bald'))
 commonLooks.append(Look('medium dark', 'black'))
 commonLooks.append(Look('medium dark', 'bald'))
-commonLooks.append(Look('dark', 'black'))
-commonLooks.append(Look('dark', 'bald'))
+#commonLooks.append(Look('dark', 'black'))
+#commonLooks.append(Look('dark', 'bald'))
 
 
 
