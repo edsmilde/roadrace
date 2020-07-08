@@ -38,6 +38,17 @@ var globalViewAttributes = {
   }
 }
 
+
+var STATUS_START=0;
+var STATUS_RUNNING=1;
+var STATUS_FINISHED=2;
+
+var gameStatus = {
+  status: STATUS_START
+}
+
+
+
 function pointToScreen(point) {
   var dx = point.x - globalViewAttributes.gameCenter.x;
   var dy = point.y - globalViewAttributes.gameCenter.y;
@@ -90,6 +101,7 @@ function BackgroundPiece(position, width, height, spritePath, zIndex) {
   this.created = false;
   this.zIndex = zIndex;
   this.element = null;
+  this.opacity = 1;
   this.render = function(screenElement) {
     var screenPosition = pointToScreen(this.position);
     var screenWidth = widthToScreen(width);
@@ -102,6 +114,7 @@ function BackgroundPiece(position, width, height, spritePath, zIndex) {
         this.element.style.height = screenHeight;
         this.element.style.position = "absolute";
         this.element.style.zIndex = this.zIndex;
+        this.element.style.opacity = this.opacity;
       }
       this.element.style.left = screenPosition.x;
       this.element.style.top = screenPosition.y;
@@ -113,6 +126,9 @@ function BackgroundPiece(position, width, height, spritePath, zIndex) {
       this.hide();
     }
   };
+  this.setOpacity = function (opacity) {
+    this.opacity = opacity;
+  }
   this.hide = function() {
     this.element.style.display = "none";
     this.element.remove();
@@ -131,18 +147,24 @@ function Move(speed, direction, intent) {
 var SPEED_BASE = 0;
 var SPEED_SURGE = 1;
 var SPEED_SLOW = 2;
+var SPEED_FINISHED = 3;
 var DIRECTION_STRAIGHT = 0;
 var DIRECTION_LEFT = 1;
 var DIRECTION_RIGHT = 2;
 var INTENT_DRAFT = 0;
 var INTENT_SURGE = 1;
+var INTENT_FINISHED=2;
 
-var PLAYER_SPRITE_OFFSET = {x: 40, y: 110};
+var FINISH_SLOWDOWN_STEPS = 40;
+
+//var PLAYER_SPRITE_OFFSET = {x: 20, y: 55};
+var PLAYER_SPRITE_OFFSET = {x: 40, y: 95};
+//var PLAYER_SPRITE_SIZE = {width: 40, height: 80};
 var PLAYER_SPRITE_SIZE = {width: 80, height: 160};
 
 var FRAMES_PER_STRIDE = 50;
 
-function Player(position, contactDirection, nextMove, energy, spriteBase, strideTime, screenElement, playerId) {
+function Player(position, contactDirection, nextMove, energy, spriteBase, strideTime, screenElement, playerId, impatienceFactor) {
   this.position = position;
   this.contactDirection = contactDirection;
   this.nextMove = nextMove;
@@ -158,10 +180,12 @@ function Player(position, contactDirection, nextMove, energy, spriteBase, stride
   this.element.style.top = screenPosition.y - PLAYER_SPRITE_OFFSET.y;
   this.element.style.width = PLAYER_SPRITE_SIZE.width;
   this.element.style.height = PLAYER_SPRITE_SIZE.height;
-  this.element.style.zIndex = this.position.y;
+  this.element.style.zIndex = Math.floor(this.position.y);
   this.element.style.position = "absolute";
+  this.impatienceFactor = impatienceFactor;
   screenElement.appendChild(this.element);
   this.finished = false;
+  this.finishStep = 0;
   this.rank = 0;
   this._log = "";
   this.incrementStride = function(time, cadence) {
@@ -171,7 +195,9 @@ function Player(position, contactDirection, nextMove, energy, spriteBase, stride
     var screenPosition = pointToScreen(this.position);
     this.element.style.left = screenPosition.x - PLAYER_SPRITE_OFFSET.x;
     this.element.style.top = screenPosition.y - PLAYER_SPRITE_OFFSET.y;
-    this.element.style.zIndex = this.position.y;
+    this.element.style.zIndex = Math.floor(this.position.y);
+  }
+  this.refreshSprite = function() {
     var relativeStridePhase = this.stridePhase / this.strideTime;
     var frame = Math.floor(relativeStridePhase * FRAMES_PER_STRIDE);
     var sprite = spriteBase + frame + ".png";
@@ -189,13 +215,18 @@ var players = new Array();
 
 var gameWindow;
 
-var GROUND_SPRITES_PATH_BASE = "sprites/ground/";
+var SPRITES_PATH_BASE = "sprites/";
+var GROUND_SPRITES_PATH_BASE = SPRITES_PATH_BASE + "ground/";
 
 function getGroundSpritePath(surface, position) {
   return GROUND_SPRITES_PATH_BASE + surface + "_" + position + ".png";
 }
 
+var LINE_SPRITES_PATH_BASE = SPRITES_PATH_BASE + "lines/";
 
+function getLineSpritePath(line) {
+  return LINE_SPRITES_PATH_BASE + line + ".png";
+}
 
 function initBackground() {
   globalBackgroundPieces = new Array();
@@ -208,14 +239,14 @@ function initBackground() {
   var roadBlockHeight = 50;
   var roadBlockWidth = 50;
   
-  var roadEndRight = 5100;
+  var roadEndRight = FINISH_DISTANCE+200;
   var roadEndBottom = 100;
   
   for (var left = roadStartLeft; left < roadEndRight; left += roadBlockWidth) {
     for (var top = roadStartTop; top < roadEndBottom; top += roadBlockHeight) {
       var thisPosition = new Point(left, top);
       var thisSprite = getGroundSpritePath("asphalt", "center");
-      var thisPiece = new BackgroundPiece(thisPosition, roadBlockWidth, roadBlockWidth, thisSprite, -1000);
+      var thisPiece = new BackgroundPiece(thisPosition, roadBlockWidth, roadBlockWidth, thisSprite, -1001);
       globalBackgroundPieces.push(thisPiece);
     }
   }
@@ -228,11 +259,11 @@ function initBackground() {
     //
     var thisTopPosition = new Point(left, roadStartTop - roadEdgeHeight);
     var thisTopSprite = getGroundSpritePath("asphalt", "top");
-    thisTopPiece = new BackgroundPiece(thisTopPosition, roadBlockWidth, roadEdgeHeight, thisTopSprite, -1000);
+    thisTopPiece = new BackgroundPiece(thisTopPosition, roadBlockWidth, roadEdgeHeight, thisTopSprite, -1001);
     globalBackgroundPieces.push(thisTopPiece);
     var thisBottomPosition = new Point(left, roadEndBottom);
     var thisBottomSprite = getGroundSpritePath("asphalt", "bottom");
-    var thisBottomPiece = new BackgroundPiece(thisBottomPosition, roadBlockWidth, roadEdgeHeight, thisBottomSprite, -1000);
+    var thisBottomPiece = new BackgroundPiece(thisBottomPosition, roadBlockWidth, roadEdgeHeight, thisBottomSprite, -1001);
     globalBackgroundPieces.push(thisBottomPiece);
     
   }
@@ -249,13 +280,32 @@ function initBackground() {
     var thisAbovePosition = new Point(left, grassAboveTop);
     var thisBelowPosition = new Point(left, grassBelowTop);
     var thisSprite = getGroundSpritePath("grass", "center")
-    var thisAbovePiece = new BackgroundPiece(thisAbovePosition, grassBlockWidth, grassBlockHeight, thisSprite, -1001);
-    var thisBelowPiece = new BackgroundPiece(thisBelowPosition, grassBlockWidth, grassBlockHeight, thisSprite, -1001);
+    var thisAbovePiece = new BackgroundPiece(thisAbovePosition, grassBlockWidth, grassBlockHeight, thisSprite, -1002);
+    var thisBelowPiece = new BackgroundPiece(thisBelowPosition, grassBlockWidth, grassBlockHeight, thisSprite, -1002);
     globalBackgroundPieces.push(thisAbovePiece);
     globalBackgroundPieces.push(thisBelowPiece);
     
     
   }
+  
+  // Start/finish lines
+  //
+  var roadHeight = roadEndBottom - roadStartTop;
+  var lineRatio = 20;
+  var lineWidth = roadHeight/lineRatio * globalViewAttributes.scale.x / globalViewAttributes.scale.y;
+  
+  var startLinePosition = new Point(0, roadStartTop);
+  var finishLinePosition = new Point(FINISH_DISTANCE, roadStartTop);
+  
+  var startLinePiece = new BackgroundPiece(startLinePosition, lineWidth, roadHeight, getLineSpritePath('start'), -1000);
+  var finishLinePiece = new BackgroundPiece(finishLinePosition, lineWidth, roadHeight, getLineSpritePath('finish'), -1000);
+  
+  startLinePiece.setOpacity(0.5);
+  finishLinePiece.setOpacity(0.5);
+  
+  
+  globalBackgroundPieces.push(startLinePiece);
+  globalBackgroundPieces.push(finishLinePiece);
   
   
 }
@@ -301,8 +351,8 @@ function init() {
     var spriteBase = "sprites/player/" + kit + "_" + look + "_";
     
     var strideTime = 500 + Math.floor(100*Math.random());
-    
-    var player = new Player(position, contactDirection, move, START_ENERGY, spriteBase, strideTime, gameWindow, i);
+    var impatienceFactor = Math.floor(20*Math.random()) + 1;
+    var player = new Player(position, contactDirection, move, START_ENERGY, spriteBase, strideTime, gameWindow, i, impatienceFactor);
     players[i] = player;
   }
   
@@ -392,21 +442,24 @@ function orthogonalDistance(pointA, pointB) {
 var SIM_STEP_TIME_MS = 25;
 var BASE_VELOCITY = 2;
 var SURGE_RATIO = 1.4;
-var STEER_RATIO = 0.2;
+var STEER_RATIO = 0.6;
 var STEER_SLOWDOWN_RATIO = Math.sqrt(1 - STEER_RATIO*STEER_RATIO);
 var FINISH_DISTANCE=5000;
-var PLAYER_RADIUS=6;
+
+var PLAYER_RADIUS=4;
+//var PLAYER_RADIUS=3;
+
 var DRAFT_LENGTH=12;
 var DRAFT_WIDTH=12;
 var DRAFT_ENERGY_RATIO=0.5;
 var SLOW_ENERGY_GAIN=0.8;
 
-var MIN_TARGET_DISTANCE=1;
-var MIN_SURGE_AVOID_DISTANCE=1;
+var MIN_TARGET_DISTANCE=2;
+var MIN_SURGE_AVOID_DISTANCE=0;
 var SURGE_AVERAGE_LENGTH=80;
 
 var KICK_DECISION_RATIO=0.8;
-var IMPATIENCE_FACTOR=10;
+var IMPATIENCE_FACTOR=5;
 var DRAFT_DECISION_LENGTH=7;
 
 var MAX_KICK_BOOST = 1.2;
@@ -417,13 +470,13 @@ function moveOption(move, potential) {
 }
 
 
-
 function simulateStep(numFinished) {
   // Get next moves
   //
   for (var i = 0; i < NUM_PLAYERS; i++) {
     players[i]._log = "";
     if (players[i].finished) {
+      players[i].nextMove = new Move(SPEED_FINISHED, DIRECTION_STRAIGHT, INTENT_FINISHED);
       continue;
     }
     
@@ -477,7 +530,8 @@ function simulateStep(numFinished) {
       if (!willSurge) {
         var distanceToFinish = FINISH_DISTANCE - players[i].position.x;
         var energyToFinish = distanceToFinish / BASE_VELOCITY / SURGE_RATIO;
-        var surgeChance = IMPATIENCE_FACTOR / SURGE_AVERAGE_LENGTH * (players[i].energy*players[i].energy) / (energyToFinish*energyToFinish);
+//        var surgeChance = IMPATIENCE_FACTOR / SURGE_AVERAGE_LENGTH * (players[i].energy*players[i].energy) / (energyToFinish*energyToFinish);
+        var surgeChance = players[i].impatienceFactor / SURGE_AVERAGE_LENGTH * (players[i].energy*players[i].energy) / (energyToFinish*energyToFinish);
         if (Math.random() < surgeChance) {
           willSurge = true;
         }
@@ -495,7 +549,7 @@ function simulateStep(numFinished) {
         // Check straight
         //
         var shouldGoStraight = true;
-        var pointStraight = new Point(players[i].x + BASE_VELOCITY*(1-SURGE_RATIO), players[i].y);
+        var pointStraight = new Point(players[i].x + BASE_VELOCITY*(1-SURGE_RATIO)*2, players[i].y);
         for (var j = 0; j < NUM_PLAYERS; j++) {
           if (i != j) {
             var distance = orthogonalDistance(pointStraight, players[i].position);
@@ -613,9 +667,6 @@ function simulateStep(numFinished) {
   // Increment next moves
   //
   for (var i = 0; i < NUM_PLAYERS; i++) {
-    if (players[i].finished) {
-      continue;
-    }
     
     var velocity = BASE_VELOCITY;
     var thisMove = players[i].nextMove;
@@ -624,7 +675,7 @@ function simulateStep(numFinished) {
       var energyToFinish = (FINISH_DISTANCE-players[i].position.x)/BASE_VELOCITY/SURGE_RATIO;
       var extraKickFactor = 1;
       if (energyToFinish < players[i].energy) {
-        extraKickFactor = Math.sqrt(players[i].energy/energyToFinish);
+        extraKickFactor = players[i].energy/energyToFinish;
         if (extraKickFactor > MAX_KICK_BOOST) {
           extraKickFactor = MAX_KICK_BOOST;
         }
@@ -634,6 +685,13 @@ function simulateStep(numFinished) {
     } else if (thisMove.speed == SPEED_SLOW) {
       velocity = BASE_VELOCITY/SURGE_RATIO;
       players[i].energy += SLOW_ENERGY_GAIN;
+    } else if (thisMove.speed == SPEED_FINISHED) {
+      var stepsSinceFinished = currentStep - players[i].finishStep;
+      if (stepsSinceFinished <= FINISH_SLOWDOWN_STEPS) {
+        velocity = BASE_VELOCITY * (1 - stepsSinceFinished / FINISH_SLOWDOWN_STEPS);
+      } else {
+        velocity = 0;
+      }
     }
     
     if (thisMove.direction == DIRECTION_STRAIGHT) {
@@ -704,7 +762,8 @@ function simulateStep(numFinished) {
     for (var j = 0; j < NUM_PLAYERS; j++) {
       if (i != j) {
         if (players[i].position.x <= players[j].position.x) {
-          dx = Math.abs(players[j].position.x - players[i].position.x - PLAYER_RADIUS);
+          dx = players[j].position.x - players[i].position.x - PLAYER_RADIUS - MIN_SURGE_AVOID_DISTANCE;
+          if (dx < 0) { dx = 0; }
           if (dx < DRAFT_LENGTH) {
             dy = Math.abs(players[j].position.y - players[i].position.y);
             if (dy < DRAFT_WIDTH/2) {
@@ -724,6 +783,7 @@ function simulateStep(numFinished) {
   for (var i = 0; i < NUM_PLAYERS; i++) {
     if (!players[i].finished && players[i].position.x >= FINISH_DISTANCE) {
       players[i].finished = true;
+      players[i].finishStep = currentStep;
       newNumFinished++;
       players[i].rank = newNumFinished;
 //      alert('Player ' + i + ' finished in rank ' + newNumFinished);
@@ -735,8 +795,46 @@ function simulateStep(numFinished) {
   
 }
 
+
+function getPlayerRank(player) {
+  var playerFinished = players[player].finished;
+  var playerX = players[player].position.x;
+  var playerFinishStep = players[player].finishStep;
+  var rank = 1;
+  for (i = 0; i < NUM_PLAYERS; i++) {
+    if (i != player) {
+      if (playerFinished) {
+        if (players[i].finished) {
+          if (players[i].finishStep < playerFinishStep) {
+            rank++;
+          }
+        }
+      } else {
+        if (players[i].position.x > playerX) {
+          rank++;
+        }
+      }
+    }
+  }
+  return rank;
+}
+
 function rgb(r, g, b) {
   return "rgb("+r+","+g+","+b+")";
+}
+
+function getOrdinal(n) {
+  var ordinal;
+  if (n % 10 == 1) {
+    ordinal = n + "st";
+  } else if (n % 10 == 2) {
+    ordinal = n + "nd";
+  } else if (n % 10 == 3) {
+    ordinal = n + "rd";
+  } else {
+    ordinal = n + "th";
+  }
+  return ordinal;
 }
 
 function rand256() {
@@ -771,6 +869,15 @@ function pointToScreen(point) {
 }
 */
 
+
+var Z_REFRESH_TIME_MS=1000;
+function updateZ() {
+  for (i = 0; i < NUM_PLAYERS; i++) {
+    players[i].element.style.zIndex = players[i].position.y;
+  }
+  setTimeout("updateZ()", Z_REFRESH_TIME_MS);
+}
+
 function animate() {
   // Re-center horizontally around player #10
   //
@@ -784,13 +891,27 @@ function animate() {
   // Position players
   //
   for (var i = 0; i < NUM_PLAYERS; i++) {
+  
+  
+    
     var cadence = 1;
     if (players[i].nextMove.speed == SPEED_SURGE) {
       cadence = SURGE_RATIO;
     } else if (players[i].nextMove.speed == SPEED_SLOW) {
       cadence = 1/SURGE_RATIO;
+    } else if (players[i].nextMove.speed == SPEED_FINISHED) {
+      var stepsSinceFinished = currentStep - players[i].finishStep;
+      if (stepsSinceFinished <= FINISH_SLOWDOWN_STEPS) {
+        cadence = (1 - stepsSinceFinished / FINISH_SLOWDOWN_STEPS);
+      } else {
+        cadence = 0;
+      }
+
     }
     players[i].incrementStride(SIM_STEP_TIME_MS, cadence);
+    
+    
+    
     players[i].render(gameWindow);
     
     
@@ -802,11 +923,40 @@ function animate() {
   var distancePercent = Math.floor(distanceRatio*100);
   document.getElementById("distancePercent").innerHTML = distancePercent;
   
+  var rank = getPlayerRank(USER_PLAYER);
+  
+  var rankDisplay = getOrdinal(rank);
+  document.getElementById("rank").innerHTML = rankDisplay;
+  
   var userEnergy = players[USER_PLAYER].energy;
-  var ENERGY_DISPLAY_RATIO = 0.5;
+  var ENERGY_DISPLAY_RATIO = 1;
   var energyMeterWidth = userEnergy*ENERGY_DISPLAY_RATIO;
   document.getElementById("energyMeterGreen").style.width = energyMeterWidth;
   
+}
+
+var SPRITE_FRAME_RATE=25;
+var SPRITE_FRAME_TIME_MS = 1000/SPRITE_FRAME_RATE;
+
+function refreshSprites() {
+  var startTime = new Date();
+  for (var i = 0; i < NUM_PLAYERS; i++) {
+    players[i].refreshSprite();
+    
+    
+  }
+  var endTime = new Date();
+  
+  var durationMs = endTime.getTime() - startTime.getTime();
+  
+  var waitTime = SPRITE_FRAME_TIME_MS - durationMs;
+  while (waitTime < 0) {
+    waitTime += SPRITE_FRAME_TIME_MS;
+  }
+//  if (waitTime < 0) { waitTime = 0; }
+  
+  setTimeout("refreshSprites()", waitTime);
+
 }
 
 
@@ -816,16 +966,41 @@ function simulate() {
   
 //  testDisplay();
   animate();
+  refreshSprites();
+  players[USER_PLAYER].element.style.borderStyle = "solid";
+  players[USER_PLAYER].element.style.borderColor = "red";
+  players[USER_PLAYER].element.style.borderWidth = "1px";
+  
   
 }
 
+
+
+var currentStep = 0;
+
 function doStepAndShow(numFinished) {
+  var startTime = new Date();
   var newNumFinished = simulateStep(numFinished);
   //testDisplay();
   animate();
+  var endTime = new Date();
+  var durationMs = endTime.getTime() - startTime.getTime();
+  var waitTime = SIM_STEP_TIME_MS - durationMs;
+  if (waitTime < 0) { waitTime = 0; }
+  
+  currentStep++;
+  
   if (newNumFinished < NUM_PLAYERS) {
+//    setTimeout('doStepAndShow(' + newNumFinished + ')', waitTime);
     setTimeout('doStepAndShow(' + newNumFinished + ')', SIM_STEP_TIME_MS);
   }
+}
+
+
+function startRace() {
+  currentStep = 0;
+  doStepAndShow(0);
+  //updateZ();
 }
 
 
@@ -899,7 +1074,7 @@ function simulateBulk() {
   height: 500px;
   border: solid 1px black;
   position: absolute;
-  top: 100;
+  top: 130;
   left: 100;
   overflow: hidden;
 }
@@ -943,14 +1118,15 @@ function simulateBulk() {
       <div id="energyMeter">
         <div id="energyMeterGreen"></div>
       </div>
-      <div id="distance">Distance: <span id="distancePercent">0</span>%</div>
+      <div id="distanceInfo">Distance: <span id="distancePercent">0</span>%</div>
+      <div id="rankInfo">Rank: <span id="rank">1st</span></div>
     </div>
     <div id="game">
       <div id="label"></div>
     </div>
     <div id="controls">
       <input type="button" name="btnSimulate" value="simulate" onclick="simulate()">
-      <input type="button" name="step" value="start" onclick="doStepAndShow(0)">
+      <input type="button" name="step" value="start" onclick="startRace()">
       <input type="button" name="debug" value="debug" onclick="showDebugInfo()">
       <input type="button" name="btnBulk" value="bulk sim" onclick="simulateBulk()">
     </div>
