@@ -1,12 +1,10 @@
 <html>
   <head>
     <title>Road Race</title>
+    <script type="text/javascript" src="js/background.js"></script>
     <script type="text/javascript">
 
 
-
-
-var globalBackgroundPieces = new Array();
 
 
 
@@ -93,50 +91,6 @@ function heightToScreen(height) {
 
 
 
-function BackgroundPiece(position, width, height, spritePath, zIndex) {
-  this.position = position;
-  this.width = width;
-  this.height = height;
-  this.spritePath = spritePath;
-  this.created = false;
-  this.zIndex = zIndex;
-  this.element = null;
-  this.opacity = 1;
-  this.render = function(screenElement) {
-    var screenPosition = pointToScreen(this.position);
-    var screenWidth = widthToScreen(width);
-    var screenHeight = heightToScreen(height);
-    if (screenPositionVisible(screenPosition, screenWidth, screenHeight)) {
-      if (!this.created) {
-        this.element = document.createElement("img");
-        this.element.setAttribute("src", spritePath);
-        this.element.style.width = screenWidth;
-        this.element.style.height = screenHeight;
-        this.element.style.position = "absolute";
-        this.element.style.zIndex = this.zIndex;
-        this.element.style.opacity = this.opacity;
-      }
-      this.element.style.left = screenPosition.x;
-      this.element.style.top = screenPosition.y;
-      if (!this.created) {
-        screenElement.appendChild(this.element);
-        this.created = true;
-      }
-    } else if (this.created) {
-      this.hide();
-    }
-  };
-  this.setOpacity = function (opacity) {
-    this.opacity = opacity;
-  }
-  this.hide = function() {
-    this.element.style.display = "none";
-    this.element.remove();
-  }
-}
-
-
-
 
 function Move(speed, direction, intent) {
   this.speed = speed;
@@ -215,111 +169,13 @@ var players = new Array();
 
 var gameWindow;
 
-var SPRITES_PATH_BASE = "sprites/";
-var GROUND_SPRITES_PATH_BASE = SPRITES_PATH_BASE + "ground/";
-
-function getGroundSpritePath(surface, position) {
-  return GROUND_SPRITES_PATH_BASE + surface + "_" + position + ".png";
-}
-
-var LINE_SPRITES_PATH_BASE = SPRITES_PATH_BASE + "lines/";
-
-function getLineSpritePath(line) {
-  return LINE_SPRITES_PATH_BASE + line + ".png";
-}
-
-function initBackground() {
-  globalBackgroundPieces = new Array();
-  // Create road
-  //
-  // Center road pieces
-  //
-  var roadStartLeft = -100;
-  var roadStartTop = -100;
-  var roadBlockHeight = 50;
-  var roadBlockWidth = 50;
-  
-  var roadEndRight = FINISH_DISTANCE+200;
-  var roadEndBottom = 100;
-  
-  for (var left = roadStartLeft; left < roadEndRight; left += roadBlockWidth) {
-    for (var top = roadStartTop; top < roadEndBottom; top += roadBlockHeight) {
-      var thisPosition = new Point(left, top);
-      var thisSprite = getGroundSpritePath("asphalt", "center");
-      var thisPiece = new BackgroundPiece(thisPosition, roadBlockWidth, roadBlockWidth, thisSprite, -1001);
-      globalBackgroundPieces.push(thisPiece);
-    }
-  }
-  
-  // Road edges
-  //
-  var roadEdgeHeight = 2.5;
-  for (var left = roadStartLeft; left < roadEndRight; left += roadBlockWidth) {
-    // Top
-    //
-    var thisTopPosition = new Point(left, roadStartTop - roadEdgeHeight);
-    var thisTopSprite = getGroundSpritePath("asphalt", "top");
-    thisTopPiece = new BackgroundPiece(thisTopPosition, roadBlockWidth, roadEdgeHeight, thisTopSprite, -1001);
-    globalBackgroundPieces.push(thisTopPiece);
-    var thisBottomPosition = new Point(left, roadEndBottom);
-    var thisBottomSprite = getGroundSpritePath("asphalt", "bottom");
-    var thisBottomPiece = new BackgroundPiece(thisBottomPosition, roadBlockWidth, roadEdgeHeight, thisBottomSprite, -1001);
-    globalBackgroundPieces.push(thisBottomPiece);
-    
-  }
-  
-  // Create backdrop
-  //
-  var grassBlockHeight = 100;
-  var grassBlockWidth = 100;
-  var grassAboveTop = roadStartTop - grassBlockHeight;
-  var grassBelowTop = roadEndBottom;
-  for (var left = roadStartLeft; left < roadEndRight; left += grassBlockWidth) {
-    // Above
-    //
-    var thisAbovePosition = new Point(left, grassAboveTop);
-    var thisBelowPosition = new Point(left, grassBelowTop);
-    var thisSprite = getGroundSpritePath("grass", "center")
-    var thisAbovePiece = new BackgroundPiece(thisAbovePosition, grassBlockWidth, grassBlockHeight, thisSprite, -1002);
-    var thisBelowPiece = new BackgroundPiece(thisBelowPosition, grassBlockWidth, grassBlockHeight, thisSprite, -1002);
-    globalBackgroundPieces.push(thisAbovePiece);
-    globalBackgroundPieces.push(thisBelowPiece);
-    
-    
-  }
-  
-  // Start/finish lines
-  //
-  var roadHeight = roadEndBottom - roadStartTop;
-  var lineRatio = 20;
-  var lineWidth = roadHeight/lineRatio * globalViewAttributes.scale.x / globalViewAttributes.scale.y;
-  
-  var startLinePosition = new Point(0, roadStartTop);
-  var finishLinePosition = new Point(FINISH_DISTANCE, roadStartTop);
-  
-  var startLinePiece = new BackgroundPiece(startLinePosition, lineWidth, roadHeight, getLineSpritePath('start'), -1000);
-  var finishLinePiece = new BackgroundPiece(finishLinePosition, lineWidth, roadHeight, getLineSpritePath('finish'), -1000);
-  
-  startLinePiece.setOpacity(0.5);
-  finishLinePiece.setOpacity(0.5);
-  
-  
-  globalBackgroundPieces.push(startLinePiece);
-  globalBackgroundPieces.push(finishLinePiece);
-  
-  
-}
-
 
 function init() {
   gameWindow = document.getElementById('game');
   
   // Draw background
   initBackground();
-  
-  for (var i = 0; i < globalBackgroundPieces.length; i++) {
-    globalBackgroundPieces[i].render(gameWindow);
-  }
+  renderBackground();
   
   // Create players
   //
@@ -878,6 +734,8 @@ function updateZ() {
   setTimeout("updateZ()", Z_REFRESH_TIME_MS);
 }
 
+var METER_WIDTH = 600;
+
 function animate() {
   // Re-center horizontally around player #10
   //
@@ -923,6 +781,9 @@ function animate() {
   var distancePercent = Math.floor(distanceRatio*100);
   document.getElementById("distancePercent").innerHTML = distancePercent;
   
+  var distanceMeterWidth = Math.floor(distanceRatio*METER_WIDTH);
+  document.getElementById("distanceMeterFill").style.width = distanceMeterWidth;
+  
   var rank = getPlayerRank(USER_PLAYER);
   
   var rankDisplay = getOrdinal(rank);
@@ -931,7 +792,8 @@ function animate() {
   var userEnergy = players[USER_PLAYER].energy;
   var ENERGY_DISPLAY_RATIO = 1;
   var energyMeterWidth = userEnergy*ENERGY_DISPLAY_RATIO;
-  document.getElementById("energyMeterGreen").style.width = energyMeterWidth;
+  document.getElementById("energyMeterFill").style.width = energyMeterWidth;
+  
   
 }
 
@@ -1086,12 +948,13 @@ function simulateBulk() {
   left: 100;
 }
 
-#energyMeter, #energyMeterGreen {
+#energyMeter, #energyMeterFill, #distanceMeter, #distanceMeterFill {
   border: 0;
   margin: 0;
   padding: 0;
   height: 25px;
 }
+
 
 #energyMeter {
   background-color: #550000;
@@ -1099,10 +962,28 @@ function simulateBulk() {
   overflow: hidden;
 }
 
-#energyMeterGreen {
+#distanceMeter {
+  width: 600px;
+  overflow: hidden;
+}
+
+
+#energyMeterFill {
   background-color: #00aa00;
-  width: 200px;
+  width: 400px;
   display: inline-block;
+  position: absolute;
+}
+
+#distanceInfo {
+  position: absolute;
+}
+
+#distanceMeterFill {
+  background-color: #ddd;
+  width: 0px;
+  display: inline-block;
+  position: absolute;
 }
 
 #controls {
@@ -1116,9 +997,12 @@ function simulateBulk() {
   <body onload="loadPage()">
     <div id="bar">
       <div id="energyMeter">
-        <div id="energyMeterGreen"></div>
+        <div id="energyMeterFill"></div>
       </div>
-      <div id="distanceInfo">Distance: <span id="distancePercent">0</span>%</div>
+      <div id="distanceMeter">
+        <div id="distanceMeterFill"></div>
+        <div id="distanceInfo">Distance: <span id="distancePercent">0</span>%</div>
+      </div>
       <div id="rankInfo">Rank: <span id="rank">1st</span></div>
     </div>
     <div id="game">

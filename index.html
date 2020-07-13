@@ -1,0 +1,65 @@
+<html>
+    <head>
+        <title>Hobbyjogger Hero 1.0</title>
+        <link rel="stylesheet" href="css/index.css">
+        
+        <script type="text/javascript" src="js/js.cookie.min.js"></script>
+        <script type="text/javascript" src="js/index.js"></script>
+        <script type="text/javascript" src="js/data/races.js"></script>
+
+        <script type="text/javascript">
+
+
+        </script>
+        <style type="text/css">
+
+
+            
+        </style>
+    </head>
+    <body onload="loadGame()">
+        <div id="gameWrapper">
+            
+            
+            <div id="createPlayer">
+                <div id="playerInfo">
+                    <form name="playerInfoForm">
+                        <div id="playerNameField">
+                            Name: <input type="text" name="playerName">
+                        </div>
+                        <div id="playerAppearanceField">Appearance:</div>
+                        <div id="playerAppearances"></div>
+                        <div id="playerKitField">Kit:</div>
+                        <div id="playerKits"></div>
+                        <div id="playerSubmitField">
+                            <input type="button" name="playerSubmit" value="Create" onclick="createPlayerSubmit()">
+                        </div>
+                    </form>
+                </div>
+    
+            </div>
+            <div id="raceMenu">
+            </div>
+            
+            
+            <div id="game">
+                <div id="bar">
+                    <div id="energyMeter">
+                        <div id="energyMeterGreen"></div>
+                    </div>
+                    <div id="distanceInfo">Distance: <span id="distancePercent">0</span>%</div>
+                    <div id="rankInfo">Rank: <span id="rank">1st</span></div>
+                </div>
+                <div id="game">
+                    <div id="label"></div>
+                </div>
+                <div id="controls">
+                    <input type="button" name="btnSimulate" value="simulate" onclick="simulate()">
+                    <input type="button" name="step" value="start" onclick="startRace()">
+                    <input type="button" name="debug" value="debug" onclick="showDebugInfo()">
+                    <input type="button" name="btnBulk" value="bulk sim" onclick="simulateBulk()">
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

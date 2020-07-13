@@ -1,0 +1,81 @@
+#game {
+    display: none;
+}
+
+
+#raceMenu {
+    display: none;
+}
+
+
+#createPlayer {
+    display: none;
+}
+
+#createPlayer, #playerNameField input, #playerSubmitField input {
+    font-family: Verdana, sans-serif;
+    font-size: 20px;
+}
+
+#playerInfo {
+    padding: 30px;
+}
+
+.playerSpriteImage {
+    width: 70px;
+    position: relative;
+    top: -25;
+}
+
+.playerSpriteLink {
+  position: relative;
+  width: 70px;
+  height: 70px;
+  display: inline-block;
+  border: solid 1px #aaa;
+}
+
+.playerSprite {
+    width: 70px;
+    height: 70px;
+    display: inline-block;
+    overflow: hidden;
+}
+
+#playerKits, #playerAppearances {
+}
+
+#gameWrapper {
+    border: solid 1px black;
+    position: absolute;
+    top: 100;
+    left: 100;
+    width: 600px;
+    padding: 10px;
+    background-color: #ddd;
+}
+            
+.raceButton, .raceTierName {
+    display: inline-block;
+    height: 100px;
+    width: 100px;
+    position: relative;
+    vertical-align: text-top;
+    text-align: center;
+    padding: 10px;
+    font-family: Verdana, sans-serif;
+    font-size: 14px;
+}
+
+.raceButton {
+  color: #000;
+}
+
+
+.raceTierName {
+  background-color: #eee;
+}
+
+
+
+
