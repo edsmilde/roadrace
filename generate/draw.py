@@ -464,6 +464,7 @@ for commonLook in players.commonLooks:
     thisBodyAttributes.skinTone = commonLook.skinTone
     thisBodyAttributes.hairColor = commonLook.hairColor
     frameCount = 0
+    animatedFrameSet = []
     for i in range(len(bodyPositionsSet)):
       numFrames = framesAfter[i]
       for j in range(numFrames):
@@ -477,12 +478,17 @@ for commonLook in players.commonLooks:
         draw = ImageDraw.Draw(image)
         drawBody(bodyCoordinatesToPlot, thisBodyAttributes, myViewAngle, draw)
     #    frames.append(image)
+        animatedFrameSet.append(image)
         image.save(filename, "PNG")
         frameCount += 1
+    animatedFilename = "sprites/player/" + str(kitCount) + "_" + str(lookCount) + ".gif"
+    animatedFrameSet[0].save(fp=animatedFilename, format="GIF", append_images=animatedFrameSet[1:], save_all=True, duration=20, loop=0)
     kitCount += 1
     drawnCount += 1
   lookCount += 1
   print("Drawn: " + str(drawnCount))
+
+
 
 
 

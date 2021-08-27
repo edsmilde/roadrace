@@ -5,7 +5,11 @@
         
         <script type="text/javascript" src="js/js.cookie.min.js"></script>
         <script type="text/javascript" src="js/index.js"></script>
+        <script type="text/javascript" src="js/data/players.js"></script>
+        <script type="text/javascript" src="js/data/players_data.js"></script>
+        <script type="text/javascript" src="js/data/backgrounds.js"></script>
         <script type="text/javascript" src="js/data/races.js"></script>
+        <script type="text/javascript" src="js/game.js"></script>
 
         <script type="text/javascript">
 
@@ -45,20 +49,15 @@
             <div id="game">
                 <div id="bar">
                     <div id="energyMeter">
-                        <div id="energyMeterGreen"></div>
+                        <div id="energyMeterFill"></div>
                     </div>
-                    <div id="distanceInfo">Distance: <span id="distancePercent">0</span>%</div>
-                    <div id="rankInfo">Rank: <span id="rank">1st</span></div>
+                    <div id="distanceMeter">
+                        <div id="distanceMeterFill"></div>
+                        <div id="distanceInfo">Distance: <span id="distancePercent">0</span>%</div>
+                      </div>
+                      <div id="rankInfo">Rank: <span id="rank">1st</span></div>
                 </div>
-                <div id="game">
-                    <div id="label"></div>
-                </div>
-                <div id="controls">
-                    <input type="button" name="btnSimulate" value="simulate" onclick="simulate()">
-                    <input type="button" name="step" value="start" onclick="startRace()">
-                    <input type="button" name="debug" value="debug" onclick="showDebugInfo()">
-                    <input type="button" name="btnBulk" value="bulk sim" onclick="simulateBulk()">
-                </div>
+                <a id="startButton" href="javascript:startRace();"><div id="startButtonDiv">START</div></a>
             </div>
         </div>
     </body>

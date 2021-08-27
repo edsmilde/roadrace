@@ -5,7 +5,7 @@ var DISTANCE_10K = 10000;
 var DISTANCE_HM = 21097.5;
 var DISTANCE_MARATHON = 42195;
 
-function RaceInfo(raceName, distance, description, thumbnail, background, requiredCompetitors, optionalCompetitors, numCompetitors, pointsMultiplier) {
+function RaceInfo(raceName, distance, description, thumbnail, background, optionalCompetitors, requiredCompetitors, numCompetitors, pointsMultiplier) {
   this.raceName = raceName;
   this.distance = distance;
   this.description = description;
@@ -14,6 +14,7 @@ function RaceInfo(raceName, distance, description, thumbnail, background, requir
   this.requiredCompetitors = requiredCompetitors;
   this.optionalCompetitors = optionalCompetitors;
   this.numCompetitors = numCompetitors;
+  this.pointsMultiplier = pointsMultiplier;
 }
 
 var competitorPoolEmpty = new Array();
@@ -22,10 +23,10 @@ var competitorPoolSample = new Array();
 var roadBackground;
 
 // Hobbyjogger tier races
-var raceDemo = new RaceInfo("Demo", DISTANCE_5K, "", roadBackground, competitorPoolEmpty, competitorPoolSample, 6, 1);
-var raceForestPark = new RaceInfo("Forest Park 10K", DISTANCE_10K, "", "", roadBackground, competitorPoolEmpty, competitorPoolSample, 9, 3);
-var raceGreatPlains = new RaceInfo("Great Plains Turkey Trot", DISTANCE_10K, "", "", roadBackground, competitorPoolEmpty, competitorPoolSample, 9, 3);
-var raceSunsetBeach = new RaceInfo("Sunset Beach Half", DISTANCE_HM, "", "", roadBackground, competitorPoolEmpty, competitorPoolSample, 9, 3);
+var raceDemo = new RaceInfo("Demo", DISTANCE_5K, "", "", getBackgroundDemo(), fieldsOptional["FieldA"], fieldsRequired["FieldA"], 6, 1);
+var raceForestPark = new RaceInfo("Forest Park 10K", DISTANCE_10K, "", "", roadBackground, fieldsOptional["FieldA"], fieldsRequired["FieldA"], 9, 3);
+var raceGreatPlains = new RaceInfo("Great Plains Turkey Trot", DISTANCE_10K, "", "", roadBackground, fieldsOptional["FieldA"], fieldsRequired["FieldA"], 9, 3);
+var raceSunsetBeach = new RaceInfo("Sunset Beach Half", DISTANCE_HM, "", "", roadBackground, fieldsOptional["FieldA"], fieldsRequired["FieldA"], 9, 3);
 
 // Sub-elite tier races
 var raceMainStreet = new RaceInfo("Main Street Half", DISTANCE_HM, "", "", roadBackground, competitorPoolEmpty, competitorPoolSample, 9, 3);

@@ -1,6 +1,6 @@
 
 
-function CompetitorInfo(name, nation, sprite, startEnergyRange, impatienceFactorRange) {
+function PlayerInfo(name, nation, sprite, startEnergy, impatienceFactor) {
   this.name = name;
   this.nation = nation;
   this.sprite = sprite;

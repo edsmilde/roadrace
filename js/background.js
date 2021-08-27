@@ -1,6 +1,6 @@
 
 
-var globalBackgroundPieces = new Array();
+var backgroundPieces = new Array();
 
 
 
@@ -67,7 +67,7 @@ function initBackground() {
 }
 
 function initBasicRoadBackground() {
-  globalBackgroundPieces = new Array();
+  backgroundPieces = new Array();
   // Create road
   //
   // Center road pieces
@@ -85,7 +85,7 @@ function initBasicRoadBackground() {
       var thisPosition = new Point(left, top);
       var thisSprite = getGroundSpritePath("asphalt", "center");
       var thisPiece = new BackgroundPiece(thisPosition, roadBlockWidth, roadBlockWidth, thisSprite, -1001);
-      globalBackgroundPieces.push(thisPiece);
+      backgroundPieces.push(thisPiece);
     }
   }
   
@@ -98,11 +98,11 @@ function initBasicRoadBackground() {
     var thisTopPosition = new Point(left, roadStartTop - roadEdgeHeight);
     var thisTopSprite = getGroundSpritePath("asphalt", "top");
     thisTopPiece = new BackgroundPiece(thisTopPosition, roadBlockWidth, roadEdgeHeight, thisTopSprite, -1001);
-    globalBackgroundPieces.push(thisTopPiece);
+    backgroundPieces.push(thisTopPiece);
     var thisBottomPosition = new Point(left, roadEndBottom);
     var thisBottomSprite = getGroundSpritePath("asphalt", "bottom");
     var thisBottomPiece = new BackgroundPiece(thisBottomPosition, roadBlockWidth, roadEdgeHeight, thisBottomSprite, -1001);
-    globalBackgroundPieces.push(thisBottomPiece);
+    backgroundPieces.push(thisBottomPiece);
     
   }
   
@@ -120,8 +120,8 @@ function initBasicRoadBackground() {
     var thisSprite = getGroundSpritePath("grass", "center")
     var thisAbovePiece = new BackgroundPiece(thisAbovePosition, grassBlockWidth, grassBlockHeight, thisSprite, -1002);
     var thisBelowPiece = new BackgroundPiece(thisBelowPosition, grassBlockWidth, grassBlockHeight, thisSprite, -1002);
-    globalBackgroundPieces.push(thisAbovePiece);
-    globalBackgroundPieces.push(thisBelowPiece);
+    backgroundPieces.push(thisAbovePiece);
+    backgroundPieces.push(thisBelowPiece);
     
     
   }
@@ -142,17 +142,23 @@ function initBasicRoadBackground() {
   finishLinePiece.setOpacity(0.5);
   
   
-  globalBackgroundPieces.push(startLinePiece);
-  globalBackgroundPieces.push(finishLinePiece);
+  backgroundPieces.push(startLinePiece);
+  backgroundPieces.push(finishLinePiece);
   
   
 }
 
 function renderBackground() {
-  for (var i = 0; i < globalBackgroundPieces.length; i++) {
-    globalBackgroundPieces[i].render(gameWindow);
+  for (var i = 0; i < backgroundPieces.length; i++) {
+    backgroundPieces[i].render(gameWindow);
   }
 }
 
+
+function renderSelectedBackground(backgroundPieces) {
+  for (var i = 0; i < backgroundPieces.length; i++) {
+    backgroundPieces[i].render(gameWindow);
+  }  
+}
 
 
