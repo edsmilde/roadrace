@@ -477,12 +477,14 @@ for commonLook in players.commonLooks:
         image = Image.new('RGBA', (150, 300), (0, 0, 0, 0))
         draw = ImageDraw.Draw(image)
         drawBody(bodyCoordinatesToPlot, thisBodyAttributes, myViewAngle, draw)
-    #    frames.append(image)
-        animatedFrameSet.append(image)
         image.save(filename, "PNG")
         frameCount += 1
-    animatedFilename = "sprites/player/" + str(kitCount) + "_" + str(lookCount) + ".gif"
-    animatedFrameSet[0].save(fp=animatedFilename, format="GIF", append_images=animatedFrameSet[1:], save_all=True, duration=20, loop=0)
+        # Animated frame
+        animatedFrameSet.append(image)
+    frameDurations = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+    for frameDuration in frameDurations:
+      animatedFilename = "sprites/player/" + str(kitCount) + "_" + str(lookCount) + "_animated_" + str(frameDuration) + ".png"
+      animatedFrameSet[0].save(fp=animatedFilename, format="png", append_images=animatedFrameSet[1:], save_all=True, duration=frameDuration, loop=0)
     kitCount += 1
     drawnCount += 1
   lookCount += 1

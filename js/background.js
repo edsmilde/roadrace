@@ -4,47 +4,47 @@ var backgroundPieces = new Array();
 
 
 
-function BackgroundPiece(position, width, height, spritePath, zIndex) {
-  this.position = position;
-  this.width = width;
-  this.height = height;
-  this.spritePath = spritePath;
-  this.created = false;
-  this.zIndex = zIndex;
-  this.element = null;
-  this.opacity = 1;
-  this.render = function(screenElement) {
-    var screenPosition = pointToScreen(this.position);
-    var screenWidth = widthToScreen(width);
-    var screenHeight = heightToScreen(height);
-    if (screenPositionVisible(screenPosition, screenWidth, screenHeight)) {
-      if (!this.created) {
-        this.element = document.createElement("img");
-        this.element.setAttribute("src", spritePath);
-        this.element.style.width = screenWidth;
-        this.element.style.height = screenHeight;
-        this.element.style.position = "absolute";
-        this.element.style.zIndex = this.zIndex;
-        this.element.style.opacity = this.opacity;
-      }
-      this.element.style.left = screenPosition.x;
-      this.element.style.top = screenPosition.y;
-      if (!this.created) {
-        screenElement.appendChild(this.element);
-        this.created = true;
-      }
-    } else if (this.created) {
-      this.hide();
-    }
-  };
-  this.setOpacity = function (opacity) {
-    this.opacity = opacity;
-  }
-  this.hide = function() {
-    this.element.style.display = "none";
-    this.element.remove();
-  }
-}
+// function BackgroundPiece(position, width, height, spritePath, zIndex) {
+//   this.position = position;
+//   this.width = width;
+//   this.height = height;
+//   this.spritePath = spritePath;
+//   this.created = false;
+//   this.zIndex = zIndex;
+//   this.element = null;
+//   this.opacity = 1;
+//   this.render = function(screenElement) {
+//     var screenPosition = pointToScreen(this.position);
+//     var screenWidth = widthToScreen(width);
+//     var screenHeight = heightToScreen(height);
+//     if (screenPositionVisible(screenPosition, screenWidth, screenHeight)) {
+//       if (!this.created) {
+//         this.element = document.createElement("img");
+//         this.element.setAttribute("src", spritePath);
+//         this.element.style.width = screenWidth;
+//         this.element.style.height = screenHeight;
+//         this.element.style.position = "absolute";
+//         this.element.style.zIndex = this.zIndex;
+//         this.element.style.opacity = this.opacity;
+//       }
+//       this.element.style.left = screenPosition.x;
+//       this.element.style.top = screenPosition.y;
+//       if (!this.created) {
+//         screenElement.appendChild(this.element);
+//         this.created = true;
+//       }
+//     } else if (this.created) {
+//       this.hide();
+//     }
+//   };
+//   this.setOpacity = function (opacity) {
+//     this.opacity = opacity;
+//   }
+//   this.hide = function() {
+//     this.element.style.display = "none";
+//     this.element.remove();
+//   }
+// }
 
 
 

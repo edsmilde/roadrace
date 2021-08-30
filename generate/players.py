@@ -29,6 +29,7 @@ commonLooks.append(Look('light', 'blonde'))
 commonLooks.append(Look('light', 'brown'))
 commonLooks.append(Look('light', 'dark'))
 commonLooks.append(Look('light', 'red'))
+commonLooks.append(Look('light', 'black'))
 commonLooks.append(Look('light', 'bald'))
 commonLooks.append(Look('medium light', 'brown'))
 commonLooks.append(Look('medium light', 'dark'))
@@ -39,8 +40,8 @@ commonLooks.append(Look('medium', 'black'))
 commonLooks.append(Look('medium', 'bald'))
 commonLooks.append(Look('medium dark', 'black'))
 commonLooks.append(Look('medium dark', 'bald'))
-#commonLooks.append(Look('dark', 'black'))
-#commonLooks.append(Look('dark', 'bald'))
+commonLooks.append(Look('dark', 'black'))
+commonLooks.append(Look('dark', 'bald'))
 
 
 
@@ -80,6 +81,9 @@ professionalKits['asics'] = Kit((240, 130, 0, 255), (10, 10, 10, 255), (200, 200
 professionalKits['skechers'] = Kit((30, 70, 30, 255), (120, 200, 255, 255), (50, 50, 120, 255))
 # Hoka
 professionalKits['hoka'] = Kit((150, 180, 240), (140, 140, 180), (220, 240, 80))
+# Puma
+professionalKits['puma'] = Kit((240, 240, 100), (10, 80, 10), (10, 10, 10))
+
 
 internationalKits = {}
 # Kenya

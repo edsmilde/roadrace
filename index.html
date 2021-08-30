@@ -9,12 +9,6 @@
         <script type="text/javascript" src="js/data/players_data.js"></script>
         <script type="text/javascript" src="js/data/backgrounds.js"></script>
         <script type="text/javascript" src="js/data/races.js"></script>
-        <script type="text/javascript" src="js/game.js"></script>
-
-        <script type="text/javascript">
-
-
-        </script>
         <style type="text/css">
 
 
@@ -45,8 +39,7 @@
             <div id="raceMenu">
             </div>
             
-            
-            <div id="game">
+            <div id="raceWrapper">
                 <div id="bar">
                     <div id="energyMeter">
                         <div id="energyMeterFill"></div>
@@ -54,10 +47,16 @@
                     <div id="distanceMeter">
                         <div id="distanceMeterFill"></div>
                         <div id="distanceInfo">Distance: <span id="distancePercent">0</span>%</div>
-                      </div>
-                      <div id="rankInfo">Rank: <span id="rank">1st</span></div>
+                    </div>
+                    <div id="rankInfo">Rank: <span id="rank">1st</span></div>
+                </div>            
+                <div id="game">
+                    <a id="startButton" href="javascript:startRace();"><div id="startButtonDiv">START</div></a>
+                    <div id="scoreboard">
+                        <div id="scoreboard-header">Results:</div>
+                    </div>
+                    <a id="doneButton" href="javascript:exitRace();"><div id="doneButtonDiv">DONE</div></a>
                 </div>
-                <a id="startButton" href="javascript:startRace();"><div id="startButtonDiv">START</div></a>
             </div>
         </div>
     </body>

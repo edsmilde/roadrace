@@ -61,7 +61,7 @@ playerFieldsOptional = {}
 
 playerId = 0
 
-JS_PLAYER_FORMAT = "playerInfo[{playerId}] = new PlayerInfo('{name}', '{nation}', '{sprite}', {startEnergy}, {impatienceFactor});"
+JS_PLAYER_FORMAT = "playerInfo[{playerId}] = new PlayerInfo('{name}', '{nation}', '{sprite}', {startEnergy}, {impatienceFactor}, {height});"
 
 for playerData in playerDataReader:
     if len(playerFieldNames) == 0:
@@ -79,7 +79,8 @@ for playerData in playerDataReader:
     # Todo: select correct sprite
     startEnergy = playerData["StartEnergy"]
     impatienceFactor = playerData["ImpatienceFactor"]
-    jsLine = JS_PLAYER_FORMAT.format(playerId=playerId, name=name, nation=nation, sprite=sprite, startEnergy=startEnergy, impatienceFactor=impatienceFactor)
+    height = playerData["Height"]
+    jsLine = JS_PLAYER_FORMAT.format(playerId=playerId, name=name, nation=nation, sprite=sprite, startEnergy=startEnergy, impatienceFactor=impatienceFactor, height=height)
     outputJsFile.write(jsLine)
     outputJsFile.write(newlines(1))
     # Get competitive fields

@@ -31,7 +31,8 @@ var gameState = {
   raceStatus: MENU_SCREEN,
   gameWindow: null,
   userPlayerIndex: 0,
-  currentStep: 0
+  currentStep: 0,
+  finalStep: 0
 };
 
 var COOKIE_NAME = "hobbyjoggerhero_state";
@@ -61,6 +62,8 @@ function loadGame() {
   } else {
     loadRaceMenu();
   }
+  document.addEventListener('keydown', handleKeyDown);
+  document.addEventListener('keyup', handleKeyUp);
 }
 
 
@@ -68,23 +71,23 @@ function loadGame() {
 var ROAD_WIDTH = 200;
 
 var globalViewAttributes = {
-    gameCenter: {
-      x: 0,
-      y: 0
-    },
-    screenCenter: {
-      x: 300,
-      y: 250
-    },
-    scale: {
-      x: 4,
-      y: 2
-    },
-    screenDimensions: {
-      width: 600,
-      height: 500
-    },
-    zIndexOffset: 2000
+  gameCenter: {
+    x: 0,
+    y: 0
+  },
+  screenCenter: {
+    x: 300,
+    y: 250
+  },
+  scale: {
+    x: 4,
+    y: 2
+  },
+  screenDimensions: {
+    width: 600,
+    height: 500
+  },
+  zIndexOffset: 2000
 }
 
 
@@ -93,99 +96,133 @@ var globalViewAttributes = {
 
 
 function pointToScreen(point) {
-    var dx = point.x - globalViewAttributes.gameCenter.x;
-    var dy = point.y - globalViewAttributes.gameCenter.y;
-    var screenX = globalViewAttributes.screenCenter.x + globalViewAttributes.scale.x*dx;
-    var screenY = globalViewAttributes.screenCenter.y + globalViewAttributes.scale.y*dy;
-    return new Point(screenX, screenY);
+  var dx = point.x - globalViewAttributes.gameCenter.x;
+  var dy = point.y - globalViewAttributes.gameCenter.y;
+  var screenX = globalViewAttributes.screenCenter.x + globalViewAttributes.scale.x*dx;
+  var screenY = globalViewAttributes.screenCenter.y + globalViewAttributes.scale.y*dy;
+  return new Point(screenX, screenY);
 };
   
+// function screenPositionVisible(topLeftScreen, width, height) {
+//   var bottomRightScreen = new Point(topLeftScreen.x + width, topLeftScreen.y + height);
+//   if (topLeftScreen.x < globalViewAttributes.screenDimensions.width
+//     && bottomRightScreen.x > 0
+//     && topLeftScreen.y < globalViewAttributes.screenDimensions.height
+//     && bottomRightScreen.y > 0) {
+//     return true;
+//   }
+//   return false;
+// }
   
-function screenPositionVisible(topLeftScreen, width, height) {
-    var bottomRightScreen = new Point(topLeftScreen.x + width, topLeftScreen.y + height);
-    if (topLeftScreen.x < globalViewAttributes.screenDimensions.width
-      && bottomRightScreen.x > 0
-      && topLeftScreen.y < globalViewAttributes.screenDimensions.height
-      && bottomRightScreen.y > 0) {
-      return true;
-    }
-    return false;
+// function pointVisibleOnScreen(topLeft, width, height) {
+//   var topLeftScreen = pointToScreen(topLeft);
+//   var bottomRight = new Point(topLeft.x + width, topLeft.y + height);
+//   var bottomRightScreen = pointToScreen(bottomRight);
+//   if (topLeftScreen.x < globalViewAttributes.screenDimensions.width
+//     && bottomRightScreen.x > 0
+//     && topLeftScreen.y < globalViewAttributes.screenDimensions.height
+//     && bottomRightScreen.y > 0) {
+//     return true;
+//   }
+//   return false;
+// }
+  
+// function widthToScreen(width) {
+//   return width * globalViewAttributes.scale.x;
+// }
+  
+// function heightToScreen(height) {
+//   return height * globalViewAttributes.scale.y;
+// }
+
+var SPRITE_START = 0;
+var SPRITE_FINISHED = 1;
+var SPRITE_RUNNING = 2;
+var SPRITE_TURBO = 3;
+
+function getSpritePath(spriteBase, spriteType, baseAnimateFrameDuration) {
+  if (spriteType == SPRITE_START) {
+    return spriteBase + "0.png";
+  } else if (spriteType == SPRITE_FINISHED) {
+    return spriteBase + "13.png";
+  } else if (spriteType == SPRITE_RUNNING) {
+    return spriteBase + "animated_" + baseAnimateFrameDuration + ".png";
+  } else {
+    var turboAnimateFrameDuration = baseAnimateFrameDuration - TURBO_FRAME_OFFSET;
+    return spriteBase + "animated_" + turboAnimateFrameDuration + ".png";
+  }
 }
-  
-function pointVisibleOnScreen(topLeft, width, height) {
-    var topLeftScreen = pointToScreen(topLeft);
-    var bottomRight = new Point(topLeft.x + width, topLeft.y + height);
-    var bottomRightScreen = pointToScreen(bottomRight);
-    if (topLeftScreen.x < globalViewAttributes.screenDimensions.width
-      && bottomRightScreen.x > 0
-      && topLeftScreen.y < globalViewAttributes.screenDimensions.height
-      && bottomRightScreen.y > 0) {
-      return true;
-    }
-    return false;
-}
-  
-function widthToScreen(width) {
-    return width * globalViewAttributes.scale.x;
-}
-  
-function heightToScreen(height) {
-    return height * globalViewAttributes.scale.y;
-}
-  
-function Player(position, contactDirection, nextMove, energy, spriteBase, strideTime, screenElement, playerId, impatienceFactor, name) {
-    this.position = position;
-    this.contactDirection = contactDirection;
-    this.nextMove = nextMove;
-    this.energy = energy;
-    this.spriteBase = spriteBase;
-    this.strideTime = strideTime;
-    this.stridePhase = 0;
-    this.name = name;
-    this.element = document.createElement("img");
-    this.element.setAttribute("src", spriteBase + "25.png");
-    this.element.setAttribute("id", "player-" + playerId);
+
+function Player(position, contactDirection, nextMove, energy, spriteBase, strideTime, screenElement, playerId, impatienceFactor, name, animateFrameDuration, relativeHeight) {
+  this.position = position;
+  this.contactDirection = contactDirection;
+  this.nextMove = nextMove;
+  this.energy = energy;
+  this.spriteBase = spriteBase;
+  this.strideTime = strideTime;
+  this.stridePhase = 0;
+  this.name = name;
+  this.element = document.createElement("img");
+  this.element.setAttribute("src", spriteBase + "25.png");
+  this.element.setAttribute("id", "player-" + playerId);
+  var screenPosition = pointToScreen(this.position);
+  this.relativeHeight = relativeHeight;
+  this.element.style.left = screenPosition.x - PLAYER_SPRITE_OFFSET.x;
+  this.element.style.top = screenPosition.y - PLAYER_SPRITE_OFFSET.y * relativeHeight;
+  this.element.style.width = PLAYER_SPRITE_SIZE.width;
+  this.element.style.height = Math.floor(PLAYER_SPRITE_SIZE.height * relativeHeight);
+  this.element.style.zIndex = Math.floor(this.position.y) + globalViewAttributes.zIndexOffset;
+  this.element.style.position = "absolute";
+  this.impatienceFactor = impatienceFactor;
+  this.animateFrameDuration = animateFrameDuration;
+  screenElement.appendChild(this.element);
+  this.finished = false;
+  this.isDoneRunning = false;
+  this.finishStep = 0;
+  this.rank = 0;
+  this.currentSprite = SPRITE_START;
+  this._log = "";
+  this.incrementStride = function(time, cadence) {
+    this.stridePhase = (this.stridePhase + time*cadence) % this.strideTime;
+  }
+  this.render = function(screenElement) {
     var screenPosition = pointToScreen(this.position);
     this.element.style.left = screenPosition.x - PLAYER_SPRITE_OFFSET.x;
-    this.element.style.top = screenPosition.y - PLAYER_SPRITE_OFFSET.y;
-    this.element.style.width = PLAYER_SPRITE_SIZE.width;
-    this.element.style.height = PLAYER_SPRITE_SIZE.height;
+    this.element.style.top = screenPosition.y - PLAYER_SPRITE_OFFSET.y * this.relativeHeight;
     this.element.style.zIndex = Math.floor(this.position.y) + globalViewAttributes.zIndexOffset;
-    this.element.style.position = "absolute";
-    this.impatienceFactor = impatienceFactor;
-    screenElement.appendChild(this.element);
-    this.finished = false;
-    this.finishStep = 0;
-    this.rank = 0;
-    this._log = "";
-    this.incrementStride = function(time, cadence) {
-        this.stridePhase = (this.stridePhase + time*cadence) % this.strideTime;
+  }
+  this.refreshSprite = function() {
+    var relativeStridePhase = this.stridePhase / this.strideTime;
+    var frame = Math.floor(relativeStridePhase * FRAMES_PER_STRIDE);
+    var sprite = spriteBase + frame + ".png";
+    this.element.setAttribute("src", sprite);
+  }
+  this.refreshSpriteAnimated = function() {
+    var correctSprite = SPRITE_RUNNING;
+    if (this.isDoneRunning) {
+      correctSprite = SPRITE_FINISHED;
+    } else if (this.nextMove.intent == INTENT_SURGE) {
+      correctSprite = SPRITE_TURBO;
     }
-    this.render = function(screenElement) {
-        var screenPosition = pointToScreen(this.position);
-        this.element.style.left = screenPosition.x - PLAYER_SPRITE_OFFSET.x;
-        this.element.style.top = screenPosition.y - PLAYER_SPRITE_OFFSET.y;
-        this.element.style.zIndex = Math.floor(this.position.y) + globalViewAttributes.zIndexOffset;
+    if (this.currentSprite != correctSprite) {
+      var sprite = getSpritePath(this.spriteBase, correctSprite, this.animateFrameDuration);
+      this.element.setAttribute("src", sprite);
+      this.currentSprite = correctSprite;
     }
-    this.refreshSprite = function() {
-        var relativeStridePhase = this.stridePhase / this.strideTime;
-        var frame = Math.floor(relativeStridePhase * FRAMES_PER_STRIDE);
-        var sprite = spriteBase + frame + ".png";
-        this.element.setAttribute("src", sprite);
-    }
+  }
 }
 
 function Point(x, y) {
-    this.x = x;
-    this.y = y;
-    this.toString = function() { return("(" + this.x + "," + this.y + ")"); };
+  this.x = x;
+  this.y = y;
+  this.toString = function() { return("(" + this.x + "," + this.y + ")"); };
 }
 
 
 function Move(speed, direction, intent) {
-    this.speed = speed;
-    this.direction = direction;
-    this.intent = intent;
+  this.speed = speed;
+  this.direction = direction;
+  this.intent = intent;
 }
 
 var SPEED_BASE = 0;
@@ -210,7 +247,6 @@ var BASE_VELOCITY = 2;
 var SURGE_RATIO = 1.4;
 var STEER_RATIO = 0.6;
 var STEER_SLOWDOWN_RATIO = Math.sqrt(1 - STEER_RATIO*STEER_RATIO);
-var FINISH_DISTANCE=5000;
 
 var PLAYER_RADIUS=4;
 //var PLAYER_RADIUS=3;
@@ -259,6 +295,10 @@ function showElementInline(id) {
   element.style.display = "inline-block";
 }
 
+function removeElement(id) {
+  var element = document.getElementById(id);
+  element.remove();
+}
 
 // Race Menu
 
@@ -468,16 +508,17 @@ function loadRace(raceInfo) {
   gameState.raceCompetitorsInfo = competitors.slice();
   gameState.raceStatus = RACE_NOT_STARTED;
   gameState.currentStep = 0;
+  gameState.finalStep = 0;
 
   var startButton = document.getElementById("startButton");
-  startButton.style.zIndex = globalViewAttributes.zIndexOffset;
   startButton.style.display = "inline-block";
 
   gameState.gameWindow = document.getElementById("game");
 
   renderSelectedBackground(raceInfo.background, gameState.gameWindow);
   document.getElementById("raceMenu").style.display = "none";
-  document.getElementById("game").style.display = "block";
+  document.getElementById("raceWrapper").style.display = "block";
+  document.getElementById("gameWrapper").style.height = "600px";
 }
 
 function renderPlayers() {
@@ -487,7 +528,11 @@ function renderPlayers() {
 
 }
 
+var BASE_HEIGHT = 69;
+
 var PLAYER_SPRITE_DIR = "sprites/player/";
+var FRAME_DURATION_RANGE = [11, 20];
+var TURBO_FRAME_OFFSET = 3;
 function initPlayers() {
   var numPlayers = gameState.raceCompetitorsInfo.length + 1;
   var userSlot = Math.floor(numPlayers/2);
@@ -504,6 +549,7 @@ function initPlayers() {
     var impatienceFactor;
     var startEnergy;
     var name;
+    var relativeHeight = 1;
     // Check which player
     if (i != userSlot) {
       var thisPlayer = i;
@@ -517,6 +563,7 @@ function initPlayers() {
       startEnergy = BASE_START_ENERGY * thisPlayerInfo.startEnergy;
       strideTime = 500 + Math.floor(100*Math.random());
       name = thisPlayerInfo.name;
+      relativeHeight = (thisPlayerInfo.height / BASE_HEIGHT)*(thisPlayerInfo.height / BASE_HEIGHT);
     } else {
       spriteBase = PLAYER_SPRITE_DIR + userState.playerInfo.kit + "_" + userState.playerInfo.appearance + "_";
       impatienceFactor = 1;
@@ -524,7 +571,10 @@ function initPlayers() {
       strideTime = 500;
       name = userState.playerInfo.name;
     }
-    var player = new Player(position, contactDirection, move, startEnergy, spriteBase, strideTime, gameState.gameWindow, i, impatienceFactor, name);
+    var animateFrameDurationMin = FRAME_DURATION_RANGE[0] + TURBO_FRAME_OFFSET;
+    var animateFrameDurationMax = FRAME_DURATION_RANGE[1]
+    var animateFrameDuration = animateFrameDurationMin + Math.floor(Math.random() * (animateFrameDurationMax - animateFrameDurationMin + 1));
+    var player = new Player(position, contactDirection, move, startEnergy, spriteBase, strideTime, gameState.gameWindow, i, impatienceFactor, name, animateFrameDuration, relativeHeight);
     gameState.racePlayers[i] = player;
   }
 
@@ -537,7 +587,8 @@ function startRace() {
     document.getElementById("startButton").style.display = "none";
     gameState.raceStatus = RACE_IN_PROGRESS;
     doStepAndShow(0);
-    refreshSprites();
+//    refreshSprites();
+//    startSpritesAnimated();
 
   }
 }
@@ -611,12 +662,64 @@ function doStepAndShow(numFinished) {
 
   gameState.currentStep++;
   var numPlayers = gameState.racePlayers.length;
-  if (newNumFinished < numPlayers) {
+  if (newNumFinished >= numPlayers) {
+    if (!gameState.finalStep) {
+      gameState.finalStep = gameState.currentStep + FINISH_SLOWDOWN_STEPS + 2;
+    }
+  }
+  if (!gameState.finalStep || gameState.currentStep < gameState.finalStep) {
     setTimeout('doStepAndShow(' + newNumFinished + ')', waitTime);
+  } else {
+    endRace();
   }
 }
 
 
+function createDivWithId(id) {
+  var element = document.createElement("div");
+  element.setAttribute("id", id);
+  return element;
+}
+
+function createDivWithText(id, text) {
+  var element = createDivWithId(id);
+  element.innerHTML = text;
+  return element;
+}
+
+function createScoreboardEntry(rank, id) {
+  var rankText = rank[1] + ". ";
+  if (rank[2]) {
+    rankText = "T-" + rankText;
+  }
+  var name = gameState.racePlayers[rank[0]].name;
+  var rankText = rankText + name;
+  var element = createDivWithText(id, rankText);
+  return element;
+}
+
+
+function endRace() {
+  gameState.raceStatus = RACE_FINISHED;
+  var rankings = getAllRankingsWhenFinished();
+
+  var scoreboardElement = document.getElementById("scoreboard");
+  var scoreContainerElement = createDivWithId("score-container");
+
+  for (var i = 0; i < rankings.length; i++) {
+    var elementId = "score-" + i;
+    var scoreboardEntry = createScoreboardEntry(rankings[i], elementId);
+    if (rankings[i][0] == gameState.userPlayerIndex) {
+      scoreboardEntry.setAttribute("class", "score-user");
+    }
+    scoreContainerElement.appendChild(scoreboardEntry);
+  }
+
+  scoreboardElement.appendChild(scoreContainerElement);
+  scoreboardElement.style.display = "block";
+
+  showElement("doneButton");
+}
 
 function simulateStep(numFinished) {
   // Get next moves
@@ -678,7 +781,7 @@ function simulateStep(numFinished) {
       // If not surging, possibly start
       //
       if (!willSurge) {
-        var distanceToFinish = FINISH_DISTANCE - players[i].position.x;
+        var distanceToFinish = gameState.raceInfo.distance - players[i].position.x;
         var energyToFinish = distanceToFinish / BASE_VELOCITY / SURGE_RATIO;
 //        var surgeChance = IMPATIENCE_FACTOR / SURGE_AVERAGE_LENGTH * (players[i].energy*players[i].energy) / (energyToFinish*energyToFinish);
         var surgeChance = players[i].impatienceFactor / SURGE_AVERAGE_LENGTH * (players[i].energy*players[i].energy) / (energyToFinish*energyToFinish);
@@ -822,7 +925,7 @@ function simulateStep(numFinished) {
     var thisMove = players[i].nextMove;
     var thisDelta = new Point(0, 0)
     if (thisMove.speed == SPEED_SURGE) {
-      var energyToFinish = (FINISH_DISTANCE-players[i].position.x)/BASE_VELOCITY/SURGE_RATIO;
+      var energyToFinish = (gameState.raceInfo.distance-players[i].position.x)/BASE_VELOCITY/SURGE_RATIO;
       var extraKickFactor = 1;
       if (energyToFinish < players[i].energy) {
         extraKickFactor = players[i].energy/energyToFinish;
@@ -841,6 +944,7 @@ function simulateStep(numFinished) {
         velocity = BASE_VELOCITY * (1 - stepsSinceFinished / FINISH_SLOWDOWN_STEPS);
       } else {
         velocity = 0;
+        players[i].isDoneRunning = true;
       }
     }
     
@@ -931,8 +1035,9 @@ function simulateStep(numFinished) {
   //
   var newNumFinished = numFinished;
   for (var i = 0; i < numPlayers; i++) {
-    if (!players[i].finished && players[i].position.x >= FINISH_DISTANCE) {
+    if (!players[i].finished && players[i].position.x >= gameState.raceInfo.distance) {
       players[i].finished = true;
+      players[i].refreshSpriteAnimated();
       players[i].finishStep = gameState.currentStep;
       newNumFinished++;
       players[i].rank = newNumFinished;
@@ -984,14 +1089,15 @@ function animate() {
     
     
     players[i].render(gameState.gameWindow);
-    
+    players[i].refreshSpriteAnimated();
     
   }
   
   // Update info bar
   //
-  var distanceRatio = players[gameState.userPlayerIndex].position.x / FINISH_DISTANCE;
+  var distanceRatio = players[gameState.userPlayerIndex].position.x / gameState.raceInfo.distance;
   var distancePercent = Math.floor(distanceRatio*100);
+  if (distancePercent > 100) { distancePercent = 100; }
   document.getElementById("distancePercent").innerHTML = distancePercent;
   
   var distanceMeterWidth = Math.floor(distanceRatio*METER_WIDTH);
@@ -1037,6 +1143,18 @@ function refreshSprites() {
 
 }
 
+function startSpritesAnimated() {
+  console.log("startSpritesAnimated");
+  var players = gameState.racePlayers;
+  var numPlayers = players.length;
+  for (var i = 0; i < numPlayers; i++) {
+    players[i].refreshSpriteAnimated();
+    
+    
+  }
+}
+
+
 function getPlayerRank(playerIndex) {
   var players = gameState.racePlayers;
   var numPlayers = players.length;
@@ -1063,6 +1181,49 @@ function getPlayerRank(playerIndex) {
 }
 
 
+function getAllRankingsWhenFinished() {
+  var playerRankings = new Array();
+  var players = gameState.racePlayers;
+  for (var i = 0; i < players.length; i++) {
+    var thisPlayerRank = 1;
+    var thisRankTie = false;
+    for (var j = 0; j < players.length; j++) {
+      if (i != j) {
+        if (players[i].finishStep > players[j].finishStep) {
+          thisPlayerRank++;
+        } else if (players[i].finishStep == players[j].finishStep) {
+          thisRankTie = true;
+        }
+      }
+    }
+    var newEntry = [i, thisPlayerRank, thisRankTie];
+    playerRankings.push(newEntry);
+  }
+  return playerRankings.sort((a, b) => { return a[1] - b[1]});
+}
+
+
+function exitRace() {
+  hideElement("doneButton");
+  removeElement("score-container");
+  hideElement("scoreboard");
+  for (var i = 0; i < gameState.racePlayers.length; i++) {
+    var element = gameState.racePlayers[i].element;
+    if (element != null) {
+      element.style.display = "none";
+      element.remove();
+    }
+  }
+  gameState.racePlayers = new Array();
+  for (var i = 0; i < gameState.raceInfo.background.length; i++) {
+    gameState.raceInfo.background[i].hide();
+  }
+  hideElement("raceWrapper");
+  showElement("raceMenu");
+}
+
+
+
 function rgb(r, g, b) {
   return "rgb("+r+","+g+","+b+")";
 }
@@ -1085,8 +1246,6 @@ function rand256() {
   return Math.floor(Math.random()*256);
 }
 
-
-
 function distanceSquared(pointA, pointB) {
   var dx = pointA.x - pointB.x;
   var dy = pointA.y - pointB.y;
@@ -1100,3 +1259,6 @@ function orthogonalDistance(pointA, pointB) {
   var dOrthogonal = dx + dy;
   return(dOrthogonal);
 }
+
+
+

@@ -1,9 +1,14 @@
 
 
-var DISTANCE_5K = 5000;
-var DISTANCE_10K = 10000;
-var DISTANCE_HM = 21097.5;
-var DISTANCE_MARATHON = 42195;
+var EFFECTIVE_DISTANCE_RATIO = 0.5;
+function getEffectiveDistance(distanceInMeters) {
+  return distanceInMeters * EFFECTIVE_DISTANCE_RATIO;
+}
+
+var DISTANCE_5K = getEffectiveDistance(5000);
+var DISTANCE_10K = getEffectiveDistance(10000);
+var DISTANCE_HM = getEffectiveDistance(21097.5);
+var DISTANCE_MARATHON = getEffectiveDistance(42195);
 
 function RaceInfo(raceName, distance, description, thumbnail, background, optionalCompetitors, requiredCompetitors, numCompetitors, pointsMultiplier) {
   this.raceName = raceName;
@@ -23,8 +28,8 @@ var competitorPoolSample = new Array();
 var roadBackground;
 
 // Hobbyjogger tier races
-var raceDemo = new RaceInfo("Demo", DISTANCE_5K, "", "", getBackgroundDemo(), fieldsOptional["FieldA"], fieldsRequired["FieldA"], 6, 1);
-var raceForestPark = new RaceInfo("Forest Park 10K", DISTANCE_10K, "", "", roadBackground, fieldsOptional["FieldA"], fieldsRequired["FieldA"], 9, 3);
+var raceDemo = new RaceInfo("Demo", DISTANCE_5K, "", "", getBackgroundDemo(DISTANCE_5K), fieldsOptional["FieldDemo"], fieldsRequired["FieldDemo"], 4, 1);
+var raceForestPark = new RaceInfo("Forest Park 10K", DISTANCE_10K, "", "", getBackgroundForestPark(DISTANCE_10K), fieldsOptional["FieldA"], fieldsRequired["FieldA"], 9, 3);
 var raceGreatPlains = new RaceInfo("Great Plains Turkey Trot", DISTANCE_10K, "", "", roadBackground, fieldsOptional["FieldA"], fieldsRequired["FieldA"], 9, 3);
 var raceSunsetBeach = new RaceInfo("Sunset Beach Half", DISTANCE_HM, "", "", roadBackground, fieldsOptional["FieldA"], fieldsRequired["FieldA"], 9, 3);
 

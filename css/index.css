@@ -4,11 +4,14 @@
     position: absolute;
 }
 
+#raceWrapper {
+    display: none;
+}
 
 #game {
-    display: none;
     width: 600px;
     height: 500px;
+    top: 100;
     border: solid 1px black;
     position: absolute;
     margin: 0;
@@ -28,7 +31,7 @@
 }
 
 #createPlayer, #playerNameField input, #playerSubmitField input {
-    font-family: Verdana, sans-serif;
+    font-family: Verdana, Verdana, Geneva, Tahoma, sans-serif;
     font-size: 20px;
 }
 
@@ -78,7 +81,7 @@
     vertical-align: text-top;
     text-align: center;
     padding: 10px;
-    font-family: Verdana, sans-serif;
+    font-family: Verdana, Verdana, Geneva, Tahoma, sans-serif;
     font-size: 14px;
 }
 
@@ -93,10 +96,11 @@
 
 #startButton {
     position: absolute;
+    z-index: 5000;
 }
 
 #startButtonDiv {
-    font-family: Verdana, sans-serif;
+    font-family: Verdana, Verdana, Geneva, Tahoma, sans-serif;
     display: inline-block;
     background-color: black;
     opacity: 0.8;
@@ -112,11 +116,36 @@
     top: 150px;
 }
 
+
+#doneButton {
+    position: absolute;
+    display: none;
+    z-index: 5000;
+}
+
+#doneButtonDiv {
+    font-family: Verdana, Verdana, Geneva, Tahoma, sans-serif;
+    display: inline-block;
+    background-color: black;
+    opacity: 0.8;
+    padding: 0.5em;
+    font-size: 20px;
+    font-weight: bolder;
+    color: white;
+    position: absolute;
+    text-align: center;
+    vertical-align: middle;
+    width: 100px;
+    left: 250px;
+    top: 400px;
+}
+
+
+
+
 #bar {
     position: absolute;
-    top: 50;
-    left: 100;
-    z-index: 2000;
+    z-index: 5000;
 }
   
 #energyMeter, #energyMeterFill, #distanceMeter, #distanceMeterFill {
@@ -150,9 +179,31 @@
 }
 
 #distanceMeterFill {
-    background-color: #ddd;
+    background-color: #aaa;
     width: 0px;
     display: inline-block;
     position: absolute;
 }
   
+
+#scoreboard {
+    display: none;
+    z-index: 5000;
+    position: absolute;
+    background-color: black;
+    border: solid 2px white;
+    color: white;
+    width: 200px;
+    left: 200px;
+    top: 100px;
+    max-height: 200;
+    padding: 0.5em;
+    font-family: 'Courier New', Courier, monospace;
+    opacity: 0.8;
+    overflow-y: auto;
+}
+
+.score-user {
+    font-weight: bolder;
+    color: #afd;
+}
