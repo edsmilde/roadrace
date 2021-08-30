@@ -1,87 +1,91 @@
-﻿FirstName,LastName,ProfessionalKit,CountryCode,Head,Limb,Shoulder,SkinTone,HairColor,Height,StartEnergy,ImpatienceFactor,FieldA,FieldB,FieldC,FieldOlympics
-Stewart,McSweyn,nike purple orange,AU,0,1,1.1,light,brown,69,1,1,optional,optional,optional,
-Patrick,Tiernan,nike purple orange,AU,0,1,1,light,brown,69,1,1,optional,optional,optional,
-Liam,Adams,nike purple orange,AU,0,1,1,light,brown,69,1,1,optional,optional,optional,optional
-Brett,Robinson,nike purple orange,AU,0,1,1,light,brown,69,1,1,optional,optional,optional,optional
-Bashir,Abdi,nn,BE,0,0.9,1,medium dark,black,70,1.1,1,optional,optional,optional,required
-Koen,Naert,nike purple orange,BE,0,1,1,light,brown,72,1,1,optional,optional,optional,optional
-Giovanni,Dos Santos,nike purple orange,BR,0,1,1,medium light,dark,69,1,1,optional,optional,optional,
-Gilmar,Silvestre Lopes,nike purple orange,BR,0,1,1,medium light,dark,69,1,1,optional,optional,optional,
-Daniel,Do Nascimento,nike purple orange,BR,0,1,1,medium light,dark,69,1,1,optional,optional,optional,optional
-Mo,Ahmed,btc,CA,0,0.9,1,medium dark,black,69,1,1,optional,optional,optional,
-Justyn,Knight,adidas white,CA,0,1,1.1,medium dark,black,69,1,1,optional,optional,optional,
-Cam,Levins,hoka,CA,0,1,1,medium light,dark,69,1,1,optional,optional,optional,optional
-Julien,Wanders,nn,CH,0,1,1,light,brown,69,1,1,optional,optional,optional,optional
-Tadesse,Abraham,nike purple orange,CH,0,1,1,medium,black,69,1,1,optional,optional,optional,optional
-Arne,Gabius,adidas white,DE,0,1,1,light,brown,69,1,1,optional,optional,optional,
-Richard,Ringer,adidas white,DE,0,1,1,light,brown,69,1,1,optional,optional,optional,
-Juan Antonio,Perez,nike purple orange,ES,0,1,1,medium light,dark,69,1,1,optional,optional,optional,
-Jesus,Gomez,nike purple orange,ES,0,1,1,medium light,dark,69,1,1,optional,optional,optional,
-Kenenisa,Bekele,nn,ET,0,1,1,medium,black,64,1,1,optional,optional,optional,
-Lelisa,Desisa,adidas white,ET,0,0.9,1,medium,black,64,1,1,optional,optional,optional,optional
-Selemon,Barega,adidas white,ET,0,0.9,1,medium,black,64,1,1,optional,optional,optional,optional
-Yomif,Kejelcha,nike purple orange,ET,0,0.8,1,medium,black,73,1,1,optional,optional,optional,optional
-Mo,Farah,nop,GB,1,0.9,1,medium dark,bald,69,1,1,optional,optional,optional,
-Callum,Hawkins,nike purple orange,GB,0,1,1,light,brown,69,1,1,optional,optional,optional,optional
-Josh,Kerr,brooks,GB,0,1,1.1,light,brown,69,1,1,optional,optional,optional,
-Charles,Da'vall Grice,nike purple orange,GB,0,1,1.1,light,blonde,69,1,1,optional,optional,optional,
-Chris,O'Hare,nike purple orange,GB,0,1,1.1,light,blonde,69,1,1,optional,optional,optional,
-Andrew,Butchart,nike purple orange,GB,0,1,1.2,light,blonde,69,1,1,optional,optional,optional,optional
-Josh,Thompson,btc,GB,0,1,1,light,brown,69,1,1,optional,optional,optional,
-Suguru,Osako,nop,JP,0,1,1,medium light,black,69,1,1,optional,optional,optional,optional
-Yuta,Shitara,asics,JP,0,1,1,medium light,black,69,1,1,optional,optional,optional,optional
-Yuma,Hattori,asics,JP,0,1,1,medium light,black,69,1,1,optional,optional,optional,optional
-Eliud,Kipchoge,nn,KE,0,0.9,1,medium dark,bald,67,1.2,1,optional,optional,optional,required
-Geoffrey,Kamworor,nn,KE,0,0.9,1,medium dark,bald,69,1.1,1,optional,optional,optional,optional
-Rhonex,Kipruto,nike purple green,KE,0,0.9,1,medium dark,bald,69,1.2,2,optional,optional,optional,optional
-Timothy,Cheruiyot,nike purple green,KE,0,0.9,1.1,medium dark,bald,69,1,1,optional,optional,optional,
-Soufiane,El Bakkali,nike purple green,MA,0,0.9,1,medium light,dark,74,1.1,1,optional,optional,optional,
-Othmane,El Gourmi,nike purple green,MA,0,0.9,1,medium light,dark,69,1,1,optional,optional,optional,optional
-Juan,Pacheo,nike purple green,MX,0,1,1,medium light,dark,69,1,1,optional,optional,optional,optional
-Jose Luis,Santana Marin,nike purple green,MX,0,1,1,medium light,dark,69,1,1,optional,optional,optional,optional
-Juan Luis,Barrios,nike purple green,MX,0,1,1,medium light,dark,69,1,1,optional,optional,optional,optional
-Abdi,Nageeye,nn,NL,0,0.9,1,medium,black,65,1.1,1,optional,optional,optional,required
-Sondre,Moen,nike purple green,NO,0,1,1,light,brown,69,1.1,1,optional,optional,optional,
-Jakob,Ingebrigtsen,nike purple green,NO,0,1,1.2,light,brown,72,1,1,optional,optional,optional,
-Filip,Ingebrigtsen,nike purple green,NO,0,1,1.2,light,blonde,74,1,1,optional,optional,optional,
-Henrik,Ingebrigtsen,nike purple green,NO,0,1,1.2,light,brown,71,1,1,optional,optional,optional,
-Jake,Robertson,nike purple green,NZ,0,1,1,light,blonde,69,1,1,optional,optional,optional,optional
-Nick,Willis,nike purple green,NZ,0,1,1,light,blonde,69,1,1,optional,optional,optional,
-Zane,Robertson,nike purple green,NZ,0,1,1,light,black,69,1,1,optional,optional,optional,optional
-Joshua,Cheptegei,nn,UG,0,0.9,1,medium dark,bald,69,1.2,1.5,optional,optional,optional,
-Ronald,Musagala,nike purple green,UG,0,0.9,1.1,dark,bald,69,1,1,optional,optional,optional,
-Abdi,Abdirahman,nike purple green,US,1,0.9,1,medium dark,bald,71,1,1,optional,optional,optional,optional
-Galen,Rupp,nop,US,0,1,1,light,blonde,71,1,1,optional,optional,optional,optional
-Jake,Riley,nike purple orange,US,0,1,1.2,light,blonde,73,1,1,optional,optional,optional,optional
-Lopez,Lomong,nike purple green,US,0,1,1.1,dark,bald,69,1,1,optional,optional,optional,
-Jared,Ward,saucony blue,US,0,1,1,light,red,69,1,1,optional,optional,optional,
-Parker,Stinson,saucony blue,US,0,1,1,light,blonde,69,1,1,optional,optional,optional,
-Futsum,Zeinasellassie,nike purple green,US,0,1,1,medium,black,69,1,1,optional,optional,optional,
-Leonard,Korir,nike purple green,US,0,0.9,1,medium dark,black,69,1,1,optional,optional,optional,
-Paul,Chelimo,nike purple green,US,0,1,1,medium dark,black,69,1,1,optional,optional,optional,
-Andrew,Hunter,adidas white,US,0,1,1,light,brown,69,1,1,optional,optional,optional,
-Matthew,Centrowitz,btc,US,0,1,1.2,light,dark,69,1,1,optional,optional,optional,
-Ben,Blankenship,otc,US,0,1,1.2,light,brown,69,1,1,optional,optional,optional,
-Kyle,Merber,nike purple green,US,0,1,1,light,brown,69,1,1,optional,optional,optional,
-Scott,Fauble,hoka,US,0,1,1,light,red,69,1,1,optional,optional,optional,
-Jim,Walmsley,hoka,US,0,1,1,light,blonde,69,1,1,optional,optional,optional,
-Izaic,Yorks,brooks,US,0,1,1,medium light,black,69,1,1,optional,optional,optional,
-Evan,Jager,btc,US,0,1,1,light,blonde,69,1,1,optional,optional,optional,
-Grant,Fisher,btc,US,0,1,1,light,dark,69,1,1,optional,optional,optional,
-Chris,Derrick,btc,US,0,1,1,light,blonde,69,1,1,optional,optional,optional,
-Andrew,Bumbalough,btc,US,0,1,1,light,brown,69,1,1,optional,optional,optional,
-Sean,McGorty,btc,US,0,1,1,light,brown,69,1,1,optional,optional,optional,
-Ryan,Hill,btc,US,0,1,1,light,dark,69,1,1,optional,optional,optional,
-Woody,Kincaid,btc,US,0,1,1,light,blonde,69,1,1,optional,optional,optional,
-Marc,Scott,btc,US,0,1,1,light,brown,69,1,1,optional,optional,optional,
-Hassan,Mead,otc,US,0,0.9,1,medium,black,69,1,1,optional,optional,optional,
-Bernard,Lagat,nike purple green,US,1,1,1,medium dark,bald,69,1,1,optional,optional,optional,
-Yuki,Kawauchi,asics,JP,0,1,1,medium light,black,69,1,1,optional,optional,optional,
-Taku,Fujimoto,asics,JP,0,1,1,medium light,black,69,1,1,optional,optional,optional,
-Ryu,Takaku,asics,JP,0,1,1,medium light,black,69,1,1,optional,optional,optional,
-Daichi,Kamino,asics,JP,0,1,1,medium light,black,69,1,1,optional,optional,optional,
-Yusuke,Ogura,asics,JP,0,1,1,medium light,black,69,1,1,optional,optional,optional,
-Jo,Fuduka,asics,JP,0,1,1,medium light,black,69,1,1,optional,optional,optional,
-Matt,Baxter,hoka,US,0,1,1,light,brown,69,1,1,optional,optional,optional,
-Scott,Smith,hoka,US,0,1,1,light,brown,69,1,1,optional,optional,optional,
-Rory,Linkletter,hoka,CA,0,1,1,light,blonde,69,1,1,optional,optional,optional,
+﻿FirstName,LastName,ProfessionalKit,CountryCode,Head,Limb,Shoulder,SkinTone,HairColor,Height,StartEnergy,ImpatienceFactor,FieldA,FieldB,FieldC,FieldOlympics,FieldDemo
+Stewart,McSweyn,nike purple orange,AU,0,1,1.1,light,brown,69,1,1,optional,optional,optional,,
+Patrick,Tiernan,nike purple orange,AU,0,1,1,light,brown,69,1,1,optional,optional,optional,,
+Liam,Adams,nike purple orange,AU,0,1,1,light,brown,69,1,1,optional,optional,optional,optional,
+Brett,Robinson,nike purple orange,AU,0,1,1,light,brown,69,1,1,optional,optional,optional,optional,
+Bashir,Abdi,nn,BE,0,0.9,1,medium dark,black,70,1.1,1,optional,optional,optional,required,
+Koen,Naert,nike purple orange,BE,0,1,1,light,brown,72,1,1,optional,optional,optional,optional,
+Giovanni,Dos Santos,nike purple orange,BR,0,1,1,medium light,dark,69,1,1,optional,optional,optional,,
+Gilmar,Silvestre Lopes,nike purple orange,BR,0,1,1,medium light,dark,69,1,1,optional,optional,optional,,
+Daniel,Do Nascimento,nike purple orange,BR,0,1,1,medium light,dark,69,1,1,optional,optional,optional,optional,
+Mo,Ahmed,btc,CA,0,0.9,1,medium dark,black,69,1,1,optional,optional,optional,,
+Justyn,Knight,adidas white,CA,0,1,1.1,medium dark,black,69,1,1,optional,optional,optional,,
+Cam,Levins,hoka,CA,0,1,1,medium light,dark,69,1,1,optional,optional,optional,optional,
+Julien,Wanders,nn,CH,0,1,1,light,brown,69,1,1,optional,optional,optional,optional,
+Tadesse,Abraham,nike purple orange,CH,0,1,1,medium,black,69,1,1,optional,optional,optional,optional,
+Arne,Gabius,adidas white,DE,0,1,1,light,brown,69,1,1,optional,optional,optional,,
+Richard,Ringer,adidas white,DE,0,1,1,light,brown,69,1,1,optional,optional,optional,,
+Juan Antonio,Perez,nike purple orange,ES,0,1,1,medium light,dark,69,1,1,optional,optional,optional,,
+Jesus,Gomez,nike purple orange,ES,0,1,1,medium light,dark,69,1,1,optional,optional,optional,,
+Kenenisa,Bekele,nn,ET,0,1,1,medium,black,64,1,1,optional,optional,optional,,
+Lelisa,Desisa,adidas white,ET,0,0.9,1,medium,black,64,1,1,optional,optional,optional,optional,
+Selemon,Barega,adidas white,ET,0,0.9,1,medium,black,64,1,1,optional,optional,optional,optional,
+Yomif,Kejelcha,nike purple orange,ET,0,0.8,1,medium,black,73,1,1,optional,optional,optional,optional,
+Mo,Farah,nop,GB,1,0.9,1,medium dark,bald,69,1,1,optional,optional,optional,,
+Callum,Hawkins,nike purple orange,GB,0,1,1,light,brown,69,1,1,optional,optional,optional,optional,
+Josh,Kerr,brooks,GB,0,1,1.1,light,brown,69,1,1,optional,optional,optional,,
+Charles,Da'vall Grice,nike purple orange,GB,0,1,1.1,light,blonde,69,1,1,optional,optional,optional,,
+Chris,O'Hare,nike purple orange,GB,0,1,1.1,light,blonde,69,1,1,optional,optional,optional,,
+Andrew,Butchart,nike purple orange,GB,0,1,1.2,light,blonde,69,1,1,optional,optional,optional,optional,
+Josh,Thompson,btc,GB,0,1,1,light,brown,69,1,1,optional,optional,optional,,
+Suguru,Osako,nop,JP,0,1,1,medium light,black,69,1,1,optional,optional,optional,optional,
+Yuta,Shitara,asics,JP,0,1,1,medium light,black,69,1,1,optional,optional,optional,optional,
+Yuma,Hattori,asics,JP,0,1,1,medium light,black,69,1,1,optional,optional,optional,optional,
+Eliud,Kipchoge,nn,KE,0,0.9,1,medium dark,bald,67,1.2,1,optional,optional,optional,required,
+Geoffrey,Kamworor,nn,KE,0,0.9,1,medium dark,bald,69,1.1,1,optional,optional,optional,optional,
+Rhonex,Kipruto,nike purple green,KE,0,0.9,1,medium dark,bald,69,1.2,2,optional,optional,optional,optional,
+Timothy,Cheruiyot,nike purple green,KE,0,0.9,1.1,medium dark,bald,69,1,1,optional,optional,optional,,
+Soufiane,El Bakkali,nike purple green,MA,0,0.9,1,medium light,dark,74,1.1,1,optional,optional,optional,,
+Othmane,El Gourmi,nike purple green,MA,0,0.9,1,medium light,dark,69,1,1,optional,optional,optional,optional,
+Juan,Pacheo,nike purple green,MX,0,1,1,medium light,dark,69,1,1,optional,optional,optional,optional,
+Jose Luis,Santana Marin,nike purple green,MX,0,1,1,medium light,dark,69,1,1,optional,optional,optional,optional,
+Juan Luis,Barrios,nike purple green,MX,0,1,1,medium light,dark,69,1,1,optional,optional,optional,optional,
+Abdi,Nageeye,nn,NL,0,0.9,1,medium,black,65,1.1,1,optional,optional,optional,required,
+Sondre,Moen,nike purple green,NO,0,1,1,light,brown,69,1.1,1,optional,optional,optional,,
+Jakob,Ingebrigtsen,nike purple green,NO,0,1,1.2,light,brown,72,1,1,optional,optional,optional,,
+Filip,Ingebrigtsen,nike purple green,NO,0,1,1.2,light,blonde,74,1,1,optional,optional,optional,,
+Henrik,Ingebrigtsen,nike purple green,NO,0,1,1.2,light,brown,71,1,1,optional,optional,optional,,
+Jake,Robertson,nike purple green,NZ,0,1,1,light,blonde,69,1,1,optional,optional,optional,optional,
+Nick,Willis,nike purple green,NZ,0,1,1,light,blonde,69,1,1,optional,optional,optional,,
+Zane,Robertson,nike purple green,NZ,0,1,1,light,dark,69,1,1,optional,optional,optional,optional,
+Joshua,Cheptegei,nn,UG,0,0.9,1,medium dark,bald,69,1.2,1.5,optional,optional,optional,,
+Ronald,Musagala,nike purple green,UG,0,0.9,1.1,dark,bald,69,1,1,optional,optional,optional,,
+Abdi,Abdirahman,nike purple green,US,1,0.9,1,medium dark,bald,71,1,1,optional,optional,optional,optional,
+Galen,Rupp,nop,US,0,1,1,light,blonde,71,1,1,optional,optional,optional,optional,
+Jake,Riley,nike purple orange,US,0,1,1.2,light,blonde,73,1,1,optional,optional,optional,optional,
+Lopez,Lomong,nike purple green,US,0,1,1.1,dark,bald,69,1,1,optional,optional,optional,,
+Jared,Ward,saucony blue,US,0,1,1,light,red,69,1,1,optional,optional,optional,,
+Parker,Stinson,saucony blue,US,0,1,1,light,blonde,69,1,1,optional,optional,optional,,
+Futsum,Zeinasellassie,nike purple green,US,0,1,1,medium,black,69,1,1,optional,optional,optional,,
+Leonard,Korir,nike purple green,US,0,0.9,1,medium dark,black,69,1,1,optional,optional,optional,,
+Paul,Chelimo,nike purple green,US,0,1,1,medium dark,black,69,1,1,optional,optional,optional,,
+Andrew,Hunter,adidas white,US,0,1,1,light,brown,69,1,1,optional,optional,optional,,
+Matthew,Centrowitz,btc,US,0,1,1.2,light,dark,69,1,1,optional,optional,optional,,
+Ben,Blankenship,otc,US,0,1,1.2,light,brown,69,1,1,optional,optional,optional,,
+Kyle,Merber,nike purple green,US,0,1,1,light,brown,69,1,1,optional,optional,optional,,
+Scott,Fauble,hoka,US,0,1,1,light,red,69,1,1,optional,optional,optional,,
+Jim,Walmsley,hoka,US,0,1,1,light,blonde,69,1,1,optional,optional,optional,,
+Izaic,Yorks,brooks,US,0,1,1,medium light,black,69,1,1,optional,optional,optional,,
+Evan,Jager,btc,US,0,1,1,light,blonde,69,1,1,optional,optional,optional,,
+Grant,Fisher,btc,US,0,1,1,light,dark,69,1,1,optional,optional,optional,,
+Chris,Derrick,btc,US,0,1,1,light,blonde,69,1,1,optional,optional,optional,,
+Andrew,Bumbalough,btc,US,0,1,1,light,brown,69,1,1,optional,optional,optional,,
+Sean,McGorty,btc,US,0,1,1,light,brown,69,1,1,optional,optional,optional,,
+Ryan,Hill,btc,US,0,1,1,light,dark,69,1,1,optional,optional,optional,,
+Woody,Kincaid,btc,US,0,1,1,light,blonde,69,1,1,optional,optional,optional,,
+Marc,Scott,btc,US,0,1,1,light,brown,69,1,1,optional,optional,optional,,
+Hassan,Mead,otc,US,0,0.9,1,medium,black,69,1,1,optional,optional,optional,,
+Bernard,Lagat,nike purple green,US,1,1,1,medium dark,bald,69,1,1,optional,optional,optional,,
+Yuki,Kawauchi,asics,JP,0,1,1,medium light,black,69,1,1,optional,optional,optional,,
+Taku,Fujimoto,asics,JP,0,1,1,medium light,black,69,1,1,optional,optional,optional,,
+Ryu,Takaku,asics,JP,0,1,1,medium light,black,69,1,1,optional,optional,optional,,
+Daichi,Kamino,asics,JP,0,1,1,medium light,black,69,1,1,optional,optional,optional,,
+Yusuke,Ogura,asics,JP,0,1,1,medium light,black,69,1,1,optional,optional,optional,,
+Jo,Fuduka,asics,JP,0,1,1,medium light,black,69,1,1,optional,optional,optional,,
+Matt,Baxter,hoka,US,0,1,1,light,brown,69,1,1,optional,optional,optional,,
+Scott,Smith,hoka,US,0,1,1,light,brown,69,1,1,optional,optional,optional,,
+Rory,Linkletter,hoka,CA,0,1,1,light,blonde,69,1,1,optional,optional,optional,,
+Usain,Bolt,puma,JA,0,1,1,dark,black,77,0.5,10,,,,,required
+Nick,Symmonds,brooks,US,0,1,1,light,blonde,69,0.5,0.5,,,,,required
+Meb,Keflezighi,skechers,US,0,1,1,medium dark,bald,65,0.5,0.5,,,,,required
+Kyle,Merber,hoka,US,0,1,1,light,dark,71,0.5,1,,,,,required
