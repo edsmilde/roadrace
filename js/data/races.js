@@ -35,12 +35,12 @@ var raceSunsetBeach = new RaceInfo("Sunset Beach 10K", DISTANCE_10K, "", "", get
 
 // Sub-elite tier races
 var raceMainStreet = new RaceInfo("Main Street Half", DISTANCE_HM, "", "", getBackgroundMainStreet(DISTANCE_HM), fieldsOptional["FieldA"], fieldsRequired["FieldA"], 9, 3);
-var raceMediterranean = new RaceInfo("Mediterranean 10K", DISTANCE_10K, "", "", roadBackground, competitorPoolEmpty, competitorPoolSample, 9, 3);
+var raceMediterranean = new RaceInfo("Mediterranean 10K", DISTANCE_10K, "", "", getBackgroundMediterranean(DISTANCE_10K), fieldsOptional["FieldA"], fieldsRequired["FieldA"], 15, 3);
 var raceOldTown = new RaceInfo("Old Town Marathon", DISTANCE_MARATHON, "", "", roadBackground, competitorPoolEmpty, competitorPoolSample, 9, 3);
-var raceArcticClassic = new RaceInfo("Arctic Classic Half", DISTANCE_HM, "", "", roadBackground, competitorPoolEmpty, competitorPoolSample, 9, 3);
+var raceArcticClassic = new RaceInfo("Arctic Classic Half", DISTANCE_HM, "", "", getBackgroundArctic(DISTANCE_HM), fieldsOptional["FieldA"], fieldsRequired["FieldA"], 15, 3);
 
 // Elite tier races
-var raceIslandGames = new RaceInfo("Island Games Marathon", DISTANCE_MARATHON, "", "", roadBackground, competitorPoolEmpty, competitorPoolSample, 9, 3);
+var raceIslandGames = new RaceInfo("Island Games Marathon", DISTANCE_MARATHON, "", "", getBackgroundIsland(DISTANCE_MARATHON), fieldsOptional["FieldA"], fieldsRequired["FieldA"], 9, 3);
 var raceMetroInternational = new RaceInfo("Metro International Marathon", DISTANCE_MARATHON, "", "", roadBackground, competitorPoolEmpty, competitorPoolSample, 9, 3);
 var raceGoldenShoe = new RaceInfo("Golden Shoe Half", DISTANCE_HM, "", "", roadBackground, competitorPoolEmpty, competitorPoolSample, 9, 3);
 var raceTropicInvitational = new RaceInfo("Tropical Invitational Marathon", DISTANCE_MARATHON, "", "", roadBackground, competitorPoolEmpty, competitorPoolSample, 9, 3);

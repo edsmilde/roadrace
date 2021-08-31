@@ -1,4 +1,9 @@
 
+var EFFECTIVE_DISTANCE_RATIO = 0.5;
+function getEffectiveDistance(distanceInMeters) {
+  return distanceInMeters * EFFECTIVE_DISTANCE_RATIO;
+}
+
 var DEFAULT_SPRITE_OFFSET = {"x": 0, "y": 0};
 
 function renderSelectedBackground(backgroundPieces, gameWindow) {
@@ -228,24 +233,6 @@ function getRoadBackgroundNoEdges(finishDistance, roadType, landType) {
       backgroundPieces.push(thisPiece);
       }
   }
-
-  // // Road edges
-  // //
-  // var roadEdgeHeight = 2.5;
-  // for (var left = roadStartLeft; left < roadEndRight; left += roadBlockWidth) {
-  //     // Top
-  //     //
-  //     var thisTopPosition = new Point(left, roadStartTop - roadEdgeHeight);
-  //     var thisTopSprite = getGroundSpritePath(roadType, "top");
-  //     thisTopPiece = new BackgroundPiece(thisTopPosition, roadBlockWidth, roadEdgeHeight, thisTopSprite, -1001, DEFAULT_SPRITE_OFFSET);
-  //     backgroundPieces.push(thisTopPiece);
-  //     var thisBottomPosition = new Point(left, roadEndBottom);
-  //     var thisBottomSprite = getGroundSpritePath(roadType, "bottom");
-  //     var thisBottomPiece = new BackgroundPiece(thisBottomPosition, roadBlockWidth, roadEdgeHeight, thisBottomSprite, -1001, DEFAULT_SPRITE_OFFSET);
-  //     backgroundPieces.push(thisBottomPiece);
-      
-  // }
-
   // Create backdrop
   //
   var grassBlockHeight = 100;
@@ -290,6 +277,138 @@ function getRoadBackgroundNoEdges(finishDistance, roadType, landType) {
 }
 
 
+
+function getRoadSection(startDistance, finishDistance, roadType) {
+  var backgroundPieces = new Array();
+  // Create road
+  //
+  // Center road pieces
+  //
+  var roadStartLeft = startDistance;
+  var roadStartTop = -100;
+  var roadBlockHeight = 50;
+  var roadBlockWidth = 50;
+
+  var roadEndRight = finishDistance;
+  var roadEndBottom = 100;
+
+  for (var left = roadStartLeft; left < roadEndRight; left += roadBlockWidth) {
+      for (var top = roadStartTop; top < roadEndBottom; top += roadBlockHeight) {
+      var thisPosition = new Point(left, top);
+      var thisSprite = getGroundSpritePath(roadType, "center");
+      var thisPiece = new BackgroundPiece(thisPosition, roadBlockWidth, roadBlockWidth, thisSprite, -1001, DEFAULT_SPRITE_OFFSET);
+      backgroundPieces.push(thisPiece);
+      }
+  }
+  return backgroundPieces;
+}
+
+
+
+
+function getRoadSectionWithEdges(startDistance, finishDistance, roadType) {
+  var backgroundPieces = new Array();
+  // Create road
+  //
+  // Center road pieces
+  //
+  var roadStartLeft = startDistance;
+  var roadStartTop = -100;
+  var roadBlockHeight = 50;
+  var roadBlockWidth = 50;
+
+  var roadEndRight = finishDistance;
+  var roadEndBottom = 100;
+
+  for (var left = roadStartLeft; left < roadEndRight; left += roadBlockWidth) {
+      for (var top = roadStartTop; top < roadEndBottom; top += roadBlockHeight) {
+      var thisPosition = new Point(left, top);
+      var thisSprite = getGroundSpritePath(roadType, "center");
+      var thisPiece = new BackgroundPiece(thisPosition, roadBlockWidth, roadBlockWidth, thisSprite, -1001, DEFAULT_SPRITE_OFFSET);
+      backgroundPieces.push(thisPiece);
+      }
+  }
+
+  // Road edges
+  //
+  var roadEdgeHeight = 2.5;
+  for (var left = roadStartLeft; left < roadEndRight; left += roadBlockWidth) {
+      // Top
+      //
+      var thisTopPosition = new Point(left, roadStartTop - roadEdgeHeight);
+      var thisTopSprite = getGroundSpritePath(roadType, "top");
+      thisTopPiece = new BackgroundPiece(thisTopPosition, roadBlockWidth, roadEdgeHeight, thisTopSprite, -1001, DEFAULT_SPRITE_OFFSET);
+      backgroundPieces.push(thisTopPiece);
+      var thisBottomPosition = new Point(left, roadEndBottom);
+      var thisBottomSprite = getGroundSpritePath(roadType, "bottom");
+      var thisBottomPiece = new BackgroundPiece(thisBottomPosition, roadBlockWidth, roadEdgeHeight, thisBottomSprite, -1001, DEFAULT_SPRITE_OFFSET);
+      backgroundPieces.push(thisBottomPiece);
+      
+  }
+  return backgroundPieces;
+}
+
+function getRoadBackgroundSection(startDistance, finishDistance, landType) {
+  var backgroundPieces = new Array();
+  // Create road
+  //
+  // Center road pieces
+  //
+  var roadStartLeft = startDistance;
+  var roadStartTop = -100;
+  var roadEndRight = finishDistance;
+  var roadEndBottom = 100;
+  
+  // Create backdrop
+  //
+  var grassBlockHeight = 100;
+  var grassBlockWidth = 100;
+  var grassAboveTop = roadStartTop - grassBlockHeight;
+  var grassBelowTop = roadEndBottom;
+  for (var left = roadStartLeft; left < roadEndRight; left += grassBlockWidth) {
+      // Above
+      //
+      var thisAbovePosition = new Point(left, grassAboveTop);
+      var thisBelowPosition = new Point(left, grassBelowTop);
+      var thisSprite = getGroundSpritePath(landType, "center")
+      var thisAbovePiece = new BackgroundPiece(thisAbovePosition, grassBlockWidth, grassBlockHeight, thisSprite, -1002, DEFAULT_SPRITE_OFFSET);
+      var thisBelowPiece = new BackgroundPiece(thisBelowPosition, grassBlockWidth, grassBlockHeight, thisSprite, -1002, DEFAULT_SPRITE_OFFSET);
+      backgroundPieces.push(thisAbovePiece);
+      backgroundPieces.push(thisBelowPiece);
+      
+      
+      
+  }
+
+  return backgroundPieces;  
+}
+
+
+
+function getStartAndFinishPieces(finishDistance) {
+  var backgroundPieces = new Array();
+
+  var roadStartTop = -100;
+  var roadEndBottom = 100;
+  var roadHeight = roadEndBottom - roadStartTop;
+  var lineRatio = 20;
+  var lineWidth = roadHeight/lineRatio * globalViewAttributes.scale.x / globalViewAttributes.scale.y;
+
+  var startLinePosition = new Point(0, roadStartTop);
+  var finishLinePosition = new Point(finishDistance, roadStartTop);
+
+  var startLinePiece = new BackgroundPiece(startLinePosition, lineWidth, roadHeight, getLineSpritePath('start'), -1000, DEFAULT_SPRITE_OFFSET);
+  var finishLinePiece = new BackgroundPiece(finishLinePosition, lineWidth, roadHeight, getLineSpritePath('finish'), -1000, DEFAULT_SPRITE_OFFSET);
+
+  startLinePiece.setOpacity(0.5);
+  finishLinePiece.setOpacity(0.5);
+
+
+  backgroundPieces.push(startLinePiece);
+  backgroundPieces.push(finishLinePiece);
+
+  return backgroundPieces;
+}
 
 
 
@@ -403,8 +522,34 @@ function getBackgroundGreatPlains(distance) {
 
 
 function getBackgroundMainStreet(distance) {
-  var background = getBrickGrassRoadBackground(distance);
+  //var background = getBrickGrassRoadBackground(distance);
+
+  var land = getRoadBackgroundSection(-100, distance + 200, "grass");
+  var brickSectionOne = getRoadSection(-100, distance/5, "brick");
+  var asphaltSection = getRoadSectionWithEdges(distance/5, 4*distance/5, "asphalt");
+  var brickSectionTwo = getRoadSection(4*distance/5, distance+200, "brick");
+
+  var startFinishPieces = getStartAndFinishPieces(distance);
+
+  var background = land.concat(brickSectionOne).concat(asphaltSection).concat(brickSectionTwo).concat(startFinishPieces);
+
+  return background;
+}
+
+function getBackgroundMediterranean(distance) {
+  var background = getRoadBackground(distance, "cobble", "limestone");
   return background;
 }
 
 
+
+
+function getBackgroundArctic(distance) {
+  var background = getRoadBackground(distance, "asphalt", "snow");
+  return background;
+}
+
+function getBackgroundIsland(distance) {
+  var background = getRoadBackgroundNoEdges(distance, "plank", "water");
+  return background;
+}
