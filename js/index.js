@@ -81,7 +81,8 @@ var globalViewAttributes = {
   },
   scale: {
     x: 4,
-    y: 2
+    y: 2,
+    z: 4*Math.sqrt(3)/2
   },
   screenDimensions: {
     width: 600,

@@ -30,11 +30,11 @@ var roadBackground;
 // Hobbyjogger tier races
 var raceDemo = new RaceInfo("Demo", DISTANCE_5K, "", "", getBackgroundDemo(DISTANCE_5K), fieldsOptional["FieldDemo"], fieldsRequired["FieldDemo"], 4, 1);
 var raceForestPark = new RaceInfo("Forest Park 10K", DISTANCE_10K, "", "", getBackgroundForestPark(DISTANCE_10K), fieldsOptional["FieldA"], fieldsRequired["FieldA"], 9, 3);
-var raceGreatPlains = new RaceInfo("Great Plains Turkey Trot", DISTANCE_10K, "", "", roadBackground, fieldsOptional["FieldA"], fieldsRequired["FieldA"], 9, 3);
-var raceSunsetBeach = new RaceInfo("Sunset Beach Half", DISTANCE_HM, "", "", roadBackground, fieldsOptional["FieldA"], fieldsRequired["FieldA"], 9, 3);
+var raceGreatPlains = new RaceInfo("Great Plains Turkey Trot", DISTANCE_10K, "", "", getBackgroundGreatPlains(DISTANCE_10K), fieldsOptional["FieldA"], fieldsRequired["FieldA"], 9, 3);
+var raceSunsetBeach = new RaceInfo("Sunset Beach 10K", DISTANCE_10K, "", "", getBackgroundSunsetBeach(DISTANCE_10K), fieldsOptional["FieldA"], fieldsRequired["FieldA"], 9, 3);
 
 // Sub-elite tier races
-var raceMainStreet = new RaceInfo("Main Street Half", DISTANCE_HM, "", "", roadBackground, competitorPoolEmpty, competitorPoolSample, 9, 3);
+var raceMainStreet = new RaceInfo("Main Street Half", DISTANCE_HM, "", "", getBackgroundMainStreet(DISTANCE_HM), fieldsOptional["FieldA"], fieldsRequired["FieldA"], 9, 3);
 var raceMediterranean = new RaceInfo("Mediterranean 10K", DISTANCE_10K, "", "", roadBackground, competitorPoolEmpty, competitorPoolSample, 9, 3);
 var raceOldTown = new RaceInfo("Old Town Marathon", DISTANCE_MARATHON, "", "", roadBackground, competitorPoolEmpty, competitorPoolSample, 9, 3);
 var raceArcticClassic = new RaceInfo("Arctic Classic Half", DISTANCE_HM, "", "", roadBackground, competitorPoolEmpty, competitorPoolSample, 9, 3);

@@ -175,7 +175,7 @@ for i in range(numToDraw):
     treeImage = Image.new('RGBA', SIZE, (0, 0, 0, 0))
     treeImage = Image.alpha_composite(leafBackgroundImage, branchImage)
     treeImage = Image.alpha_composite(treeImage, leafForegroundImage)
-    filename = OUTPUT_PATH + str(i) + ".png"
+    filename = OUTPUT_PATH + "deciduous_" + str(i) + ".png"
     treeImage.save(filename, "PNG")
 
 
